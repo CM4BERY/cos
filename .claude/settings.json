@@ -1,0 +1,20 @@
+{
+  "permissions": {
+    "deny": ["Read(./secrets/**)"]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "^(Edit|Write|MultiEdit|NotebookEdit)$",
+        "hooks": [{ "type": "command", "command": "python .claude/hooks/cos_write_gate.py", "timeout": 10 }]
+      },
+      {
+        "matcher": "^Bash$",
+        "hooks": [{ "type": "command", "command": "python .claude/hooks/cos_bash_guard.py", "timeout": 10 }]
+      }
+    ],
+    "Stop": [
+      { "hooks": [{ "type": "command", "command": "python .claude/hooks/cos_stop_evidence.py", "timeout": 10 }] }
+    ]
+  }
+}

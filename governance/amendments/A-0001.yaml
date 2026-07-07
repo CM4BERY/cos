@@ -1,0 +1,18 @@
+id: A-0001
+title: "Recognize .claude/** as an elevated protected scope"
+proposed_by:
+  actor: "agent:claude-fable-5"
+  office: proposer
+target:
+  file: policy/protected_scopes.yaml
+  section: elevated
+reason:
+  - ".claude/** now carries execution-time enforcement (hooks, settings, skills)"
+  - "an actor who can edit its own gates can quietly relax them"
+  - "docs/automation-layer.md Stage 2 requires this before hooks ship"
+evidence:
+  - docs/automation-layer.md
+proposed_change:
+  from: "elevated: policy/**, capabilities/**, schemas/**, validators/**, .github/**"
+  to: "elevated: policy/**, capabilities/**, schemas/**, validators/**, .github/**, .claude/**"
+rollback: "Revert the tr-0004 commit; .claude/** returns to default medium risk."

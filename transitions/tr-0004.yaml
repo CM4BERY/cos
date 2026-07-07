@@ -1,0 +1,38 @@
+id: tr-0004
+intent: >
+  Automation layer Stage 2 (high-confidence enforcement) per
+  docs/automation-layer.md: amendment A-0001 recognizing .claude/** as an
+  elevated protected scope; Claude Code settings wiring three hooks (write
+  gate, bash guard, stop-evidence gate); the transition scaffold tool; the
+  hook/artifact harness plus its CI step; and the cos-transition skill.
+requested_by:
+  actor: "agent:claude-fable-5"
+  office: executor
+capability_id: cap-0000-genesis
+targets:
+  - "governance/amendments/A-0001.yaml"
+  - "policy/protected_scopes.yaml"
+  - ".claude/**"
+  - "tools/cos_new_transition.py"
+  - "tools/test_hooks.sh"
+  - ".github/workflows/cos-validate.yml"
+  - "evidence/reviews/tr-0004-spec-conformance.md"
+  - "evidence/test_runs/tr-0004-hook-harness.txt"
+  - "evidence/test_runs/tr-0004-validation.txt"
+advisory_risk_class: high
+rollback_plan: >
+  git revert the tr-0004 commit: hooks, settings, skill, scaffold tool, and
+  the A-0001 scope change all revert together; .claude/** returns to default
+  medium risk.
+verification_note: >
+  tools/test_hooks.sh passes 18/18 fixture assertions (fail-closed action
+  gates, fail-open stop gate, settings parse, skill hygiene); full validator
+  suite passes via bash tools/cos_validate.sh. Outputs preserved at
+  evidence/test_runs/tr-0004-hook-harness.txt and
+  evidence/test_runs/tr-0004-validation.txt.
+evidence:
+  reviews:
+    - evidence/reviews/tr-0004-spec-conformance.md
+  test_runs:
+    - evidence/test_runs/tr-0004-hook-harness.txt
+    - evidence/test_runs/tr-0004-validation.txt

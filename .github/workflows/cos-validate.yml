@@ -28,3 +28,5 @@ jobs:
       - name: Run COS validators
         working-directory: validators
         run: python run_all.py --base "${{ steps.base.outputs.ref }}" --head HEAD
+      - name: Hook and artifact harness
+        run: bash tools/test_hooks.sh
