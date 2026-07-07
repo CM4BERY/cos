@@ -1,0 +1,22 @@
+id: tr-0001
+intent: >
+  First post-genesis transition: add the quickstart walkthrough and preserve
+  the bootstrap verification evidence (genesis validation output and the
+  negative-test denial) in the evidence store.
+requested_by:
+  actor: "agent:claude-fable-5"
+  office: executor
+capability_id: cap-0000-genesis
+targets:
+  - "docs/quickstart.md"
+  - "evidence/test_runs/negative-test-denied.txt"
+  - "evidence/test_runs/tr-0001-validation.txt"
+advisory_risk_class: low
+rollback_plan: "git revert the commit for tr-0001; no state outside the repo is touched."
+verification_note: >
+  validators/run_all.py --base HEAD --head WORKTREE passes 5/5; output at
+  evidence/test_runs/tr-0001-validation.txt.
+evidence:
+  test_runs:
+    - evidence/test_runs/tr-0001-validation.txt
+    - evidence/test_runs/negative-test-denied.txt
