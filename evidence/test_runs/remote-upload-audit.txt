@@ -1,0 +1,15 @@
+# Audit of https://github.com/CM4BERY/cos as uploaded via web UI (2026-07-07)
+# Findings: .github/ and .gitignore dropped by the web upload; the genesis commit
+# chain was replaced by 4 ungoverned upload commits; ledger file intact (evt-0001..0002).
+# COS validators run against the uploaded copy (HEAD~1..HEAD):
+cos-validate: base=HEAD~1 head=HEAD
+[FAIL] validate_ledger
+       - every transition appends exactly one ledger event; found 2
+[PASS] validate_schemas
+[FAIL] validate_capability_scope
+       - cannot identify the transition: expected exactly one appended ledger event (see validate_ledger)
+[PASS] validate_enforcement_claims
+       warn: docs/target-architecture.md: locus-exempt file (non-normative by declaration)
+[PASS] validate_no_self_approval
+RESULT: FAIL -- transition is denied
+exit_code=1

@@ -1,0 +1,25 @@
+id: tr-0002
+intent: >
+  Set the real owner in CODEOWNERS (@CM4BERY) so the platform half of the
+  gateway binds to the owning account, and record the audit of the
+  web-uploaded remote copy that was missing .github/ entirely.
+requested_by:
+  actor: "agent:claude-fable-5"
+  office: executor
+capability_id: cap-0000-genesis
+targets:
+  - ".github/CODEOWNERS"
+  - "evidence/reviews/tr-0002-owner-review.md"
+  - "evidence/test_runs/remote-upload-audit.txt"
+  - "evidence/test_runs/tr-0002-validation.txt"
+advisory_risk_class: high
+rollback_plan: "git revert the commit for tr-0002; CODEOWNERS returns to the placeholder."
+verification_note: >
+  validators/run_all.py --base HEAD --head WORKTREE passes 5/5; output at
+  evidence/test_runs/tr-0002-validation.txt.
+evidence:
+  reviews:
+    - evidence/reviews/tr-0002-owner-review.md
+  test_runs:
+    - evidence/test_runs/tr-0002-validation.txt
+    - evidence/test_runs/remote-upload-audit.txt
