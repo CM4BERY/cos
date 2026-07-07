@@ -1,0 +1,25 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ledger_event",
+  "type": "object",
+  "required": ["event_id", "prev", "timestamp", "type", "actor", "office", "transition_id", "capability_id", "risk_class", "decision"],
+  "properties": {
+    "event_id": {"type": "string", "pattern": "^evt-[0-9]{4}$"},
+    "prev": {"type": ["string", "null"], "pattern": "^evt-[0-9]{4}$"},
+    "timestamp": {"type": "string", "format": "date-time"},
+    "type": {
+      "type": "string",
+      "enum": ["constitution_ratified", "transition_committed", "transition_rolled_back", "capability_issued", "capability_revoked", "amendment_ratified", "waiver_recorded"]
+    },
+    "actor": {"type": "string", "minLength": 1},
+    "office": {"type": "string", "enum": ["proposer", "executor", "reviewer", "human_owner"]},
+    "transition_id": {"type": "string", "pattern": "^tr-[0-9]{4}[a-z0-9-]*$"},
+    "capability_id": {"type": "string", "pattern": "^cap-[a-z0-9-]+$"},
+    "risk_class": {"type": "string", "enum": ["low", "medium", "high", "critical"]},
+    "decision": {"type": "string", "enum": ["allow", "allow_with_constraints", "require_review", "require_human", "deny"]},
+    "targets": {"type": "array", "items": {"type": "string"}},
+    "evidence": {"type": "array", "items": {"type": "string"}},
+    "notes": {"type": "string"}
+  },
+  "additionalProperties": false
+}

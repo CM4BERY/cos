@@ -1,0 +1,38 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "transition_request",
+  "type": "object",
+  "required": ["id", "intent", "requested_by", "capability_id", "targets"],
+  "properties": {
+    "id": {"type": "string", "pattern": "^tr-[0-9]{4}[a-z0-9-]*$"},
+    "intent": {"type": "string", "minLength": 1},
+    "requested_by": {
+      "type": "object",
+      "required": ["actor", "office"],
+      "properties": {
+        "actor": {"type": "string", "minLength": 1},
+        "office": {"type": "string", "enum": ["proposer", "executor", "reviewer", "human_owner"]}
+      },
+      "additionalProperties": false
+    },
+    "capability_id": {"type": "string", "pattern": "^cap-[a-z0-9-]+$"},
+    "targets": {"type": "array", "items": {"type": "string"}, "minItems": 1},
+    "advisory_risk_class": {
+      "type": "string",
+      "enum": ["low", "medium", "high", "critical"],
+      "description": "Requester's opinion only; validators compute the real class from the diff."
+    },
+    "rollback_plan": {"type": "string"},
+    "verification_note": {"type": "string"},
+    "evidence": {
+      "type": "object",
+      "properties": {
+        "approvals": {"type": "array", "items": {"type": "string"}},
+        "reviews": {"type": "array", "items": {"type": "string"}},
+        "test_runs": {"type": "array", "items": {"type": "string"}}
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

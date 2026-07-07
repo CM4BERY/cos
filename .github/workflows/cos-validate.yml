@@ -1,0 +1,30 @@
+# The gateway's CI half. Make this a required status check on main, disable
+# force pushes, and prefer squash merge so one merge = one transition.
+name: cos-validate
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install pyyaml jsonschema
+      - name: Determine diff base
+        id: base
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            echo "ref=${{ github.event.pull_request.base.sha }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "ref=$(git rev-parse HEAD~1 2>/dev/null || echo GENESIS)" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Run COS validators
+        working-directory: validators
+        run: python run_all.py --base "${{ steps.base.outputs.ref }}" --head HEAD

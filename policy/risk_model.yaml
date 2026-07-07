@@ -1,0 +1,35 @@
+# Risk model. Risk is COMPUTED by validators/validate_capability_scope.py
+# from the diff: any file in a critical scope -> critical; elevated -> high;
+# low_risk_paths -> low; everything else -> medium. The transition's
+# advisory_risk_class and the requester's opinion never override computation.
+version: "0.1.0"
+
+low_risk_paths:
+  - docs/**
+  - README.md
+
+# Record paths are the transition protocol's own bookkeeping. They are exempt
+# from scope-based risk (else every transition would score on itself) and are
+# governed instead by validate_ledger.py and validate_schemas.py.
+record_paths:
+  - ledger/events.ndjson
+  - transitions/**
+  - evidence/**
+
+risk_classes:
+  low:
+    requires: [valid_capability, ledger_event]
+  medium:
+    requires: [valid_capability, ledger_event, rollback_plan, verification_note]
+  high:
+    requires: [valid_capability, ledger_event, rollback_plan, verification_note, independent_review]
+  critical:
+    requires: [valid_capability, ledger_event, rollback_plan, verification_note, human_approval]
+
+forbidden:
+  - self_issued_capability_without_human_approval
+  - ledger_history_rewrite
+  - execute_without_capability
+  - expired_capability_use
+  - constitution_change_without_ratification
+  - risk_class_self_declaration_override

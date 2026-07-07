@@ -1,0 +1,23 @@
+# Constitutional principles. Each principle names its enforcement locus;
+# validators/validate_enforcement_claims.py fails any normative claim in
+# markdown docs that lacks one, and checks that every risk class and
+# forbidden rule has a locus entry in policy/enforcement_loci.yaml.
+principles:
+  - name: enforceability
+    rule: "No normative rule is valid unless attached to an enforcement locus."
+    locus: validators/validate_enforcement_claims.py
+  - name: least_authority
+    rule: "Actors act only under a capability scoped to the transition."
+    locus: validators/validate_capability_scope.py
+  - name: auditability
+    rule: "Every merge appends exactly one ledger event; history is append-only."
+    locus: validators/validate_ledger.py
+  - name: separation_of_powers
+    rule: "No actor approves its own authority expansion."
+    locus: validators/validate_no_self_approval.py
+  - name: reversibility
+    rule: "Medium risk and above carries a rollback plan; git revert is the mechanism."
+    locus: validators/validate_capability_scope.py
+  - name: computed_risk
+    rule: "Risk class is computed from the diff; a requester's declaration is advisory only."
+    locus: validators/validate_capability_scope.py

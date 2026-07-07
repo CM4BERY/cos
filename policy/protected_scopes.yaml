@@ -1,0 +1,17 @@
+# Protected scopes. Critical scopes take precedence over elevated.
+# Enforcement: risk computation in validators/validate_capability_scope.py,
+# plus CODEOWNERS review and branch protection on the hosting platform.
+#
+# Note: ledger/events.ndjson, transitions/**, and evidence/** are record
+# paths, not protected scopes. Their integrity is enforced by
+# validators/validate_ledger.py and validators/validate_schemas.py instead
+# of scope matching (see policy/risk_model.yaml record_paths).
+critical:
+  - constitution/**
+  - secrets/**
+elevated:
+  - policy/**
+  - capabilities/**
+  - schemas/**
+  - validators/**
+  - .github/**

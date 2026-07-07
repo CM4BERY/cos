@@ -1,0 +1,32 @@
+# Autonomy lanes (informational mapping onto computed risk classes).
+# The verification ceiling applies: a scope's real lane equals the strength
+# of the computable checks over it, whatever this table says.
+lanes:
+  - lane: 0
+    name: read_only
+    risk_class: null
+    execution: autonomous
+    note: "Reads produce no diff; nothing to govern in v0."
+  - lane: 1
+    name: low
+    risk_class: low
+    execution: autonomous
+    capability_issued_by: human_owner   # standing capabilities permitted
+  - lane: 2
+    name: medium
+    risk_class: medium
+    execution: autonomous_with_constraints
+    capability_issued_by: human_owner
+  - lane: 3
+    name: high
+    risk_class: high
+    execution: independent_review_to_merge   # locus: branch-protection
+  - lane: 4
+    name: critical
+    risk_class: critical
+    execution: human_ratification_to_merge   # locus: codeowners
+  - lane: 5
+    name: forbidden
+    risk_class: null
+    execution: denied
+    note: "No issuance path exists; validators fail the transition."

@@ -1,0 +1,25 @@
+id: tr-0000
+intent: >
+  Bootstrap COS v0: ratify the constitution, install policy, schemas,
+  validators, and the CI gateway, and create the ledger. Touches
+  constitution/**, so the computed risk class is critical and the transition
+  is committed only with the human owner's ratification.
+requested_by:
+  actor: "agent:claude-fable-5"
+  office: executor
+capability_id: cap-0000-genesis
+targets:
+  - "**"
+advisory_risk_class: critical
+rollback_plan: >
+  Delete the repository. Genesis has no prior state; the empty tree is the
+  rollback target. Post-genesis transitions roll back via git revert.
+verification_note: >
+  validators/run_all.py executed against the empty tree (GENESIS) prior to
+  commit; all five validators pass. Output preserved at
+  evidence/test_runs/genesis-validation.txt.
+evidence:
+  approvals:
+    - evidence/approvals/tr-0000-human-ratification.md
+  test_runs:
+    - evidence/test_runs/genesis-validation.txt

@@ -1,0 +1,10 @@
+# COS genesis validation -- run prior to the genesis commit (base=GENESIS)
+# 2026-07-07T18:19:00Z
+cos-validate: base=GENESIS head=WORKTREE
+[PASS] validate_ledger
+[PASS] validate_schemas
+[PASS] validate_capability_scope
+[PASS] validate_enforcement_claims
+       warn: docs/target-architecture.md: locus-exempt file (non-normative by declaration)
+[PASS] validate_no_self_approval
+RESULT: ALL PASS -- transition may commit

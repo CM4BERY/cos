@@ -1,0 +1,50 @@
+# COS v0 charter. Changes to this file are critical-risk: merge is gated by
+# CODEOWNERS review from the human owner (enforcement locus: codeowners,
+# branch-protection).
+identity:
+  system_name: "COS"
+  version: "0.1.0"
+  purpose: >
+    Govern agentic work through constitutionally constrained state transitions.
+    In v0, the repository is the state, merge is the only transition, and CI
+    validators are the policy engine.
+  human_owner:
+    name: "Boss"
+    email: "coltonmabery@gmail.com"
+  source_of_truth: >
+    The git repository is the sole authoritative state. The ledger
+    (ledger/events.ndjson) is git-tracked; anything derived from it is
+    rebuildable and never authoritative.
+
+threat_model:
+  file: constitution/threat_model.md
+  summary: >
+    v0 defends against honest-but-fallible actors, not adversarial ones.
+    Enforcement therefore lives at merge time (branch protection + CI), the
+    only locus an in-process actor cannot route around.
+
+non_delegable_authority:
+  - constitutional_ratification        # locus: codeowners
+  - capability_issuance_approval       # locus: codeowners (capabilities/** is elevated scope)
+  - critical_scope_merge               # locus: codeowners + branch-protection
+
+offices:
+  # v0 records offices in ledger events but does not enforce appointment or
+  # quorum machinery; that is deferred to v2 (see docs/target-architecture.md).
+  proposer:
+    may: [submit_transition, submit_amendment]
+  executor:
+    may: [execute_transition_under_capability]
+  reviewer:
+    may: [approve_transition, reject_transition]
+  human_owner:
+    may: [ratify_constitution, issue_capability, approve_critical_transition]
+
+genesis:
+  clause: >
+    The commit that creates the ledger is ratified directly by the human owner.
+    The ratification record is evidence/approvals/tr-0000-human-ratification.md.
+    Every subsequent change enters through the transition protocol: capability,
+    transition record, ledger event, validators, merge.
+  transition_id: tr-0000
+  ledger_event: evt-0001

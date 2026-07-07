@@ -1,0 +1,21 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "capability",
+  "type": "object",
+  "required": ["id", "issued_by", "issued_to_actor", "issued_for_office", "allowed_actions", "allowed_targets", "issued_at", "expires_at"],
+  "properties": {
+    "id": {"type": "string", "pattern": "^cap-[a-z0-9-]+$"},
+    "issued_by": {"type": "string", "minLength": 1},
+    "issued_to_actor": {"type": "string", "minLength": 1},
+    "issued_for_office": {"type": "string", "enum": ["proposer", "executor", "reviewer", "human_owner"]},
+    "task_id": {"type": ["string", "null"]},
+    "allowed_actions": {"type": "array", "items": {"type": "string"}, "minItems": 1},
+    "allowed_targets": {"type": "array", "items": {"type": "string"}, "minItems": 1},
+    "denied_targets": {"type": "array", "items": {"type": "string"}},
+    "issued_at": {"type": "string", "format": "date-time"},
+    "expires_at": {"type": "string", "format": "date-time"},
+    "revocable": {"type": "boolean"},
+    "notes": {"type": "string"}
+  },
+  "additionalProperties": false
+}

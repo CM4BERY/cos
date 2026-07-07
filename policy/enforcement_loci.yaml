@@ -1,0 +1,34 @@
+# Every risk class and every forbidden rule maps to a real enforcement locus.
+# validators/validate_enforcement_claims.py fails if an entry here is missing
+# or points at a locus that does not exist. Known non-file loci:
+# branch-protection, codeowners, human-approval, manual, git.
+risk_classes:
+  low:
+    - validators/validate_capability_scope.py
+    - validators/validate_ledger.py
+  medium:
+    - validators/validate_capability_scope.py
+    - validators/validate_ledger.py
+  high:
+    - validators/validate_capability_scope.py
+    - branch-protection
+  critical:
+    - validators/validate_capability_scope.py
+    - codeowners
+    - branch-protection
+
+forbidden:
+  self_issued_capability_without_human_approval:
+    - validators/validate_no_self_approval.py
+  ledger_history_rewrite:
+    - validators/validate_ledger.py
+    - branch-protection
+  execute_without_capability:
+    - validators/validate_capability_scope.py
+  expired_capability_use:
+    - validators/validate_capability_scope.py
+  constitution_change_without_ratification:
+    - codeowners
+    - branch-protection
+  risk_class_self_declaration_override:
+    - validators/validate_capability_scope.py

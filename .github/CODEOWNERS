@@ -1,0 +1,8 @@
+# Human key for protected doors. Replace @OWNER with the human owner's
+# GitHub username, then require CODEOWNERS review in branch protection.
+/constitution/  @OWNER
+/policy/        @OWNER
+/capabilities/  @OWNER
+/schemas/       @OWNER
+/validators/    @OWNER
+/.github/       @OWNER

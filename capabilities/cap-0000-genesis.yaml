@@ -1,0 +1,17 @@
+# Genesis capability: issued by the human owner to bootstrap the system.
+# Broad by necessity, expiring by design. Post-bootstrap work belongs under
+# narrow capabilities.
+id: cap-0000-genesis
+issued_by: "human:boss <coltonmabery@gmail.com>"
+issued_to_actor: "agent:claude-fable-5"
+issued_for_office: executor
+task_id: tr-0000
+allowed_actions: [create_file, edit_file, run_validators]
+allowed_targets:
+  - "**"
+denied_targets:
+  - "secrets/**"
+issued_at: "2026-07-07T18:00:00Z"
+expires_at: "2026-07-08T18:00:00Z"
+revocable: true
+notes: "Bootstrap of COS v0; ratification evidence in evidence/approvals/tr-0000-human-ratification.md."
