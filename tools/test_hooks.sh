@@ -25,6 +25,33 @@ expect "gate: constitution ask"   ask   "$(decision cos_write_gate.py '{"cwd":".
 expect "gate: no-session deny"    deny  "$(decision cos_write_gate.py '{"cwd":".","tool_input":{"file_path":"docs/x.md"}}')"
 expect "gate: record path allow"  allow "$(decision cos_write_gate.py '{"cwd":".","tool_input":{"file_path":"transitions/tr-9999.yaml"}}')"
 expect "gate: garbage fail-closed" deny "$(echo garbage | "$PY" .claude/hooks/cos_write_gate.py | "$PY" -c "import json,sys; print(json.load(sys.stdin)['hookSpecificOutput']['permissionDecision'])")"
+# --- write gate: declared-targets enforcement (regression: column-0 YAML lists)
+mkdir -p .cos
+cat > capabilities/cap-9997-harness.yaml <<'Y'
+id: cap-9997-harness
+issued_by: "harness:fixture"
+issued_to_actor: "agent:claude-fable-5"
+issued_for_office: executor
+allowed_actions: [edit_file]
+allowed_targets:
+- "docs/**"
+issued_at: "2020-01-01T00:00:00Z"
+expires_at: "2099-01-01T00:00:00Z"
+Y
+cat > transitions/tr-9997.yaml <<'Y'
+id: tr-9997
+targets:
+- docs/harness-probe.md
+Y
+printf '{"transition_id":"tr-9997","capability_id":"cap-9997-harness"}' > "$SESS"
+expect "gate: in-target allow (col-0 list)" allow "$(decision cos_write_gate.py '{"cwd":".","tool_input":{"file_path":"docs/harness-probe.md"}}')"
+expect "gate: out-of-target deny"           deny  "$(decision cos_write_gate.py '{"cwd":".","tool_input":{"file_path":"README.md"}}')"
+cat > transitions/tr-9997.yaml <<'Y'
+id: tr-9997
+targets: []
+Y
+expect "gate: empty targets fail-closed"    deny  "$(decision cos_write_gate.py '{"cwd":".","tool_input":{"file_path":"docs/harness-probe.md"}}')"
+rm -f transitions/tr-9997.yaml capabilities/cap-9997-harness.yaml "$SESS"
 [ "$PARKED" = 1 ] && mv "$SESS.parked" "$SESS"
 
 # --- bash guard

@@ -40,7 +40,7 @@ def main():
                     in_targets = True
                     continue
                 if in_targets:
-                    m = re.match(r'\s+-\s*"?([^"#]+?)"?\s*$', line)
+                    m = re.match(r'\s*-\s*"?([^"#]+?)"?\s*$', line)
                     if m:
                         targets.append(m.group(1).strip())
                     else:

@@ -1,0 +1,32 @@
+id: tr-0005
+intent: Fix write-gate target parsing (column-0 YAML lists bypassed the declared-targets
+  check); same fix in cos_status; empty-targets now fails closed; regression fixtures
+  added to harness
+requested_by:
+  actor: agent:claude-fable-5
+  office: executor
+capability_id: cap-0000-genesis
+targets:
+- .claude/hooks/cos_write_gate.py
+- tools/cos_status.py
+- tools/test_hooks.sh
+- evidence/reviews/tr-0005-review.md
+- evidence/test_runs/tr-0005-hook-harness.txt
+- evidence/test_runs/tr-0005-validation.txt
+advisory_risk_class: high
+rollback_plan: git revert the tr-0005 commit; no state outside the repo is touched.
+verification_note: >
+  Defect found by post-commit verification of tr-0004: the write gate's
+  target parser required indented list items, so scaffold-emitted column-0
+  YAML lists parsed as empty and the declared-targets check was skipped
+  (fail-open). Fixed to accept column-0 items and to fail closed on empty
+  targets. Harness extended with three regression fixtures using a synthetic
+  capability (21/21 PASS). Outputs at
+  evidence/test_runs/tr-0005-hook-harness.txt and
+  evidence/test_runs/tr-0005-validation.txt.
+evidence:
+  reviews:
+  - evidence/reviews/tr-0005-review.md
+  test_runs:
+  - evidence/test_runs/tr-0005-hook-harness.txt
+  - evidence/test_runs/tr-0005-validation.txt

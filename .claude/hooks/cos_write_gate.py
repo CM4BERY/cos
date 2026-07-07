@@ -86,12 +86,15 @@ try:
                 in_targets = True
                 continue
             if in_targets:
-                m = re.match(r'\s+-\s*"?([^"#]+?)"?\s*$', line)
+                m = re.match(r'\s*-\s*"?([^"#]+?)"?\s*$', line)
                 if m:
                     targets.append(m.group(1).strip())
                 else:
                     in_targets = False
-    if targets and not match(rel, targets):
+    if not targets:
+        decide("deny", f"COS write gate: {tr_id} declares no parseable targets "
+                       f"(use a block list under 'targets:'). Failing closed.")
+    if not match(rel, targets):
         decide("deny", f"COS write gate: {rel} is outside declared targets of "
                        f"{tr_id}. Update the transition record's targets first "
                        f"(auditable), then retry.")
