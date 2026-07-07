@@ -1,0 +1,29 @@
+id: tr-0003
+intent: >
+  Automation layer Stage 1 (quick wins) per docs/automation-layer.md: add
+  CLAUDE.md operating contract, the sanctioned ledger writer
+  (tools/cos_append_event.py), the validation wrapper with Stop-hook marker
+  (tools/cos_validate.sh), deterministic context recovery
+  (tools/cos_status.py), the owner-approved spec into docs/, and .gitignore
+  entries for local agent state.
+requested_by:
+  actor: "agent:claude-fable-5"
+  office: executor
+capability_id: cap-0000-genesis
+targets:
+  - "CLAUDE.md"
+  - "docs/automation-layer.md"
+  - "tools/cos_append_event.py"
+  - "tools/cos_validate.sh"
+  - "tools/cos_status.py"
+  - ".gitignore"
+  - "evidence/test_runs/tr-0003-validation.txt"
+advisory_risk_class: medium
+rollback_plan: "git revert the tr-0003 commit; no state outside the repo is touched."
+verification_note: >
+  Event appended by tools/cos_append_event.py itself (maiden run, proving the
+  tool end-to-end); bash tools/cos_validate.sh passes 5/5; output preserved at
+  evidence/test_runs/tr-0003-validation.txt.
+evidence:
+  test_runs:
+    - evidence/test_runs/tr-0003-validation.txt
