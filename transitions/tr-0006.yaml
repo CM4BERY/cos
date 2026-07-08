@@ -1,0 +1,17 @@
+id: tr-0006
+intent: "Canary PR: add the cos-validate status badge to README \u2014 first transition\
+  \ through the platform gateway (required check + CODEOWNERS review + squash\
+  \ merge)"
+requested_by:
+  actor: agent:claude-fable-5
+  office: executor
+capability_id: cap-0000-genesis
+targets:
+- README.md
+- evidence/test_runs/tr-0006-validation.txt
+advisory_risk_class: low
+rollback_plan: git revert the tr-0006 commit; no state outside the repo is touched.
+verification_note: >
+  BASE=main bash tools/cos_validate.sh passes the full suite; output at
+  evidence/test_runs/tr-0006-validation.txt. Badge URL points at the
+  cos-validate workflow on this repository.

@@ -1,5 +1,7 @@
 # COS v0 — Git-native Constitutional Operating System
 
+[![cos-validate](https://github.com/CM4BERY/cos/actions/workflows/cos-validate.yml/badge.svg)](https://github.com/CM4BERY/cos/actions/workflows/cos-validate.yml)
+
 Merge is the only door. Every state change arrives as a pull request carrying
 a transition record, a capability, exactly one ledger event, and evidence.
 Risk is computed from the diff, never from the requester's declaration
