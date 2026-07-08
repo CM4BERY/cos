@@ -1,0 +1,26 @@
+# First narrow standing capability, replacing cap-0000-genesis (expires
+# 2026-07-08T18:00Z). Scope: the automation/navigation surfaces plus record
+# paths. Ratification: evidence/approvals/cap-0001-ratification.md.
+id: cap-0001-agent-standing
+issued_by: "human:boss <coltonmabery@gmail.com>"
+issued_to_actor: "agent:claude-fable-5"
+issued_for_office: executor
+task_id: null
+allowed_actions: [create_file, edit_file, run_validators, run_ship]
+allowed_targets:
+  - "tools/**"
+  - "docs/**"
+  - "README.md"
+  - "policy/navigation.yaml"
+  - ".claude/**"
+  - "capabilities/cap-0001-agent-standing.yaml"
+  - "transitions/**"
+  - "ledger/events.ndjson"
+  - "evidence/**"
+denied_targets:
+  - "secrets/**"
+  - "constitution/**"
+issued_at: "2026-07-08T05:00:00Z"
+expires_at: "2026-08-07T05:00:00Z"
+revocable: true
+notes: "30-day standing authority for the automation and navigation layers."
