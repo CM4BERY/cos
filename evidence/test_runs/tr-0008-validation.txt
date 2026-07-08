@@ -1,0 +1,26 @@
+# COS tr-0008 validation -- two runs, deliberately preserved
+#
+# Run 1 (FAIL): validate_enforcement_claims caught a bare normative word
+# ('validated') in docs/status.md line 16 -- the close-out document itself
+# answered to the locus linter. Wording fixed; no exemption taken.
+# Run 2 (PASS): after the one-word fix.
+#
+## Run 1 output (excerpt):
+[FAIL] validate_enforcement_claims
+       - docs/status.md:16: normative claim without [locus: ...] tag
+RESULT: FAIL -- transition is denied
+
+## Run 2 (full):
+# 2026-07-08T05:57:35Z
+cos-validate: base=origin/main head=WORKTREE
+[PASS] validate_ledger
+[PASS] validate_schemas
+[PASS] validate_capability_scope
+[PASS] validate_enforcement_claims
+       warn: .claude/skills/cos-transition/SKILL.md: locus-exempt file (non-normative by declaration)
+       warn: docs/automation-layer.md: locus-exempt file (non-normative by declaration)
+       warn: docs/navigation-layer.md: locus-exempt file (non-normative by declaration)
+       warn: docs/target-architecture.md: locus-exempt file (non-normative by declaration)
+[PASS] validate_no_self_approval
+RESULT: ALL PASS -- transition may commit
+exit_code=0

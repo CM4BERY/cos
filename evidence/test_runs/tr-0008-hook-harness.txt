@@ -1,0 +1,32 @@
+# COS hook harness -- tr-0008
+# 2026-07-08T05:56:39Z
+PASS  gate: ledger deny
+PASS  gate: secrets deny
+PASS  gate: constitution ask
+PASS  gate: no-session deny
+PASS  gate: record path allow
+PASS  gate: garbage fail-closed
+PASS  gate: in-target allow (col-0 list)
+PASS  gate: out-of-target deny
+PASS  gate: empty targets fail-closed
+PASS  guard: force-push deny
+PASS  guard: ledger redirect deny
+PASS  guard: append tool allow
+PASS  guard: plain push ask
+PASS  guard: pip foreign deny
+PASS  guard: pip deps allow
+PASS  guard: bypass-var deny
+PASS  guard: reset-hard deny
+PASS  guard: garbage fail-closed
+PASS  guard: gh repo delete deny
+PASS  guard: gh api DELETE deny
+PASS  guard: manual gh merge ask
+PASS  guard: gh auth logout ask
+PASS  guard: gh pr view allow
+PASS  ship: refuses on main
+PASS  ship: classify_checks
+PASS  stop: garbage fail-open (rc 0)
+PASS  settings.json parses
+PASS  skill hygiene: .claude/skills/cos-transition/SKILL.md
+HARNESS: ALL PASS
+exit_code=0

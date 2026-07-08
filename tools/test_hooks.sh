@@ -73,6 +73,15 @@ expect "guard: gh pr view allow"     allow "$(decision cos_bash_guard.py '{"cwd"
 # --- ship tool: refuses to run off a transition branch (offline check)
 "$PY" tools/cos_ship.py --render-only >/dev/null 2>&1
 [ "$?" = "1" ] && echo "PASS  ship: refuses on main" || { echo "FAIL  ship: should refuse on main"; FAIL=1; }
+"$PY" -c "
+import sys; sys.path.insert(0, 'tools')
+from cos_ship import classify_checks as c
+assert c('0 cancelled, 0 failing, 1 successful, 0 skipped, and 0 pending checks') == 'green'
+assert c('0 cancelled, 0 failing, 1 successful, 0 skipped, and 2 pending checks') == 'pending'
+assert c('0 cancelled, 1 failing, 0 successful, 0 skipped, and 0 pending checks') == 'failing'
+assert c('1 cancelled, 0 failing, 1 successful, 0 skipped, and 0 pending checks') == 'failing'
+assert c('gibberish') == 'unknown'
+" >/dev/null 2>&1 && echo "PASS  ship: classify_checks" || { echo "FAIL  ship: classify_checks"; FAIL=1; }
 
 # --- stop gate polarity
 echo garbage | "$PY" .claude/hooks/cos_stop_evidence.py >/dev/null 2>&1
