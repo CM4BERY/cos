@@ -17,6 +17,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import time
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "validators"))
@@ -24,6 +25,27 @@ import yaml
 from cos_lib import REPO, ledger_events
 
 LANES = {"low", "medium", "high", "critical"}
+
+SUMMARY_RE = re.compile(
+    r"(\d+) cancelled, (\d+) failing, (\d+) successful, (\d+) skipped, and (\d+) pending")
+
+
+def classify_checks(text):
+    """Classify `gh pr checks` summary output: green | failing | pending | unknown.
+
+    gh exits nonzero for BOTH failing and merely-pending checks; the ship
+    pipeline needs the distinction (observed live on PR #2, 2026-07-08).
+    unknown is treated as failing by callers -- action gates fail closed.
+    """
+    m = SUMMARY_RE.search(text)
+    if not m:
+        return "unknown"
+    cancelled, failing, successful, skipped, pending = map(int, m.groups())
+    if failing or cancelled:
+        return "failing"
+    if pending:
+        return "pending"
+    return "green" if successful else "unknown"
 
 
 def sh(args, check=True, cwd=None):
@@ -187,7 +209,18 @@ def main():
     step("watching checks (cos-validate)...")
     r = sh(["gh", "pr", "checks", branch, "--watch", "--fail-fast"], check=False)
     if r.returncode != 0:
-        die(f"checks failed on the PR -- nothing merged.\n{r.stdout}\nSee {url}")
+        # nonzero means failing OR pending; classify before concluding anything
+        for attempt in range(8):
+            s = sh(["gh", "pr", "checks", branch], check=False)
+            state = classify_checks(s.stdout + s.stderr)
+            if state == "green":
+                break
+            if state in ("failing", "unknown"):
+                die(f"checks {state} on the PR -- nothing merged.\n{s.stdout}\nSee {url}")
+            step(f"checks pending (none failing) -- waiting 15s ({attempt + 1}/8)...")
+            time.sleep(15)
+        else:
+            die(f"checks still pending after 2 minutes -- rerun cos_ship to resume.\nSee {url}")
     step("checks: green")
 
     # P10: merge per policy

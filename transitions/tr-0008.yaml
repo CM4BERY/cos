@@ -1,0 +1,21 @@
+id: tr-0008
+intent: 'Close-out: teach cos_ship to distinguish pending from failing checks
+  (classify_checks + bounded wait), add its offline harness test, and record system
+  status in docs/status.md as the durable context-recovery point'
+requested_by:
+  actor: agent:claude-fable-5
+  office: executor
+capability_id: cap-0001-agent-standing
+targets:
+- tools/cos_ship.py
+- tools/test_hooks.sh
+- docs/status.md
+- evidence/test_runs/tr-0008-hook-harness.txt
+- evidence/test_runs/tr-0008-validation.txt
+advisory_risk_class: medium
+rollback_plan: git revert the tr-0008 commit; no state outside the repo is touched.
+verification_note: >
+  Harness passes including the new classify_checks assertions (green /
+  pending / failing / cancelled->failing / unknown); full validator suite
+  passes. Outputs at evidence/test_runs/tr-0008-*.txt. The pending-wait
+  path exercises live on this transition's own shipping.
