@@ -1,0 +1,14 @@
+# Navigation policy for tools/cos_ship.py. Elevated scope (policy/**).
+# Owner-resolved decisions recorded in docs/navigation-layer.md section 7.
+version: "0.1.0"
+expected_account: CMABERY
+merge_method: squash
+delete_branch_after_merge: true
+# Bypass evidence lives where the bypass happens: GitHub's PR timeline, plus
+# a typed reason comment for flag lanes. governance_debt.py (Stage 3) counts
+# bypass-merged PRs by lane.
+bypass:
+  low: auto        # merge with --admin, no ceremony
+  medium: auto
+  high: flag       # requires --bypass "one-line reason"; posted as PR comment
+  critical: flag

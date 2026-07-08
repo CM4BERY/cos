@@ -1,0 +1,38 @@
+# cos_ship offline smoke -- 2026-07-08T05:14:37Z
+
+== 1. dirty worktree refusal (captured pre-commit in build repo):
+SHIP: REFUSED: worktree is dirty. Commit the transition first (validate, then commit).
+exit=1
+
+== 2. high lane without --bypass (post-commit, scratch clone):
+SHIP: REFUSED: expected exactly one ledger event for tr-0007, found 0
+exit=1
+
+== 3. render-only with --bypass (post-commit, event appended):
+SHIP: validators: RESULT: ALL PASS -- transition may commit
+SHIP: render-only: preflights above passed; PR body follows
+------------------------------------------------------------
+TITLE: tr-0007: Navigation layer per docs/cos-navigation-layer design (owner-resolved): policy/n [evt-0008]
+# Transition
+
+One PR = one transition. CI recomputes risk from the diff.
+
+- Transition record: transitions/tr-0007.yaml
+- Ledger event appended: evt-0008 (exactly one)
+- Capability: cap-0001-agent-standing
+- Computed risk class: high -> require_review
+- Rollback plan: git revert the tr-0007 commit; no state outside the repo is touched.
+
+## Intent
+
+Navigation layer per docs/cos-navigation-layer design (owner-resolved): policy/navigation.yaml, tools/cos_ship.py one-command ship pipeline, gh guard rules + harness fixtures, skill ship step, 30-day narrow capability cap-0001 with owner ratification
+
+Local validator RESULT: RESULT: ALL PASS -- transition may commit
+
+------------------------------------------------------------
+SHIP: planned: git push -u origin tr-0007
+SHIP: planned: gh pr create --title <title> --body-file <tmp>
+SHIP: planned: gh pr checks tr-0007 --watch --fail-fast
+SHIP: planned: gh pr comment tr-0007 --body 'BYPASS (high): solo owner ratification per docs/navigation-layer.md'
+SHIP: planned: gh pr merge tr-0007 --squash --admin --subject <title> --delete-branch
+exit=0

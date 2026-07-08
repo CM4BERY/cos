@@ -38,8 +38,12 @@ whether a change needs a transition, assume it does.
 9. Delegate to the transition-auditor subagent if available; address findings.
 10. Commit with agent authorship:
     `git commit --author="claude-fable-5 (agent) <agent@cos.local>"`.
-11. Ask the user before pushing (the bash guard will ask anyway).
-12. Produce a PR body matching .github/pull_request_template.md.
+11. Ship: `python3 tools/cos_ship.py` (add `--bypass "one-line reason"` when
+    the computed lane is high or critical). The tool pushes, opens the PR
+    from the record, watches checks, merges per policy/navigation.yaml,
+    verifies the remote, and syncs main. Headless; it prints the PR URL.
+12. Never merge by hand. A manual `gh pr merge` is ask-gated by the bash
+    guard; the ship tool is the sanctioned path.
 
 # Stop conditions
 Stop and ask the user if: no covering capability exists; the change touches

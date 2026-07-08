@@ -64,6 +64,15 @@ expect "guard: pip deps allow"    allow "$(decision cos_bash_guard.py '{"cwd":".
 expect "guard: bypass-var deny"   deny  "$(decision cos_bash_guard.py '{"cwd":".","tool_input":{"command":"export COS_ALLOW_DANGEROUS=1"}}')"
 expect "guard: reset-hard deny"   deny  "$(decision cos_bash_guard.py '{"cwd":".","tool_input":{"command":"git reset --hard HEAD~1"}}')"
 expect "guard: garbage fail-closed" deny "$(echo garbage | "$PY" .claude/hooks/cos_bash_guard.py | "$PY" -c "import json,sys; print(json.load(sys.stdin)['hookSpecificOutput']['permissionDecision'])")"
+expect "guard: gh repo delete deny"  deny "$(decision cos_bash_guard.py '{"cwd":".","tool_input":{"command":"gh repo delete CM4BERY/cos --yes"}}')"
+expect "guard: gh api DELETE deny"   deny "$(decision cos_bash_guard.py '{"cwd":".","tool_input":{"command":"gh api -X DELETE /repos/CM4BERY/cos"}}')"
+expect "guard: manual gh merge ask"  ask  "$(decision cos_bash_guard.py '{"cwd":".","tool_input":{"command":"gh pr merge tr-0007 --squash"}}')"
+expect "guard: gh auth logout ask"   ask  "$(decision cos_bash_guard.py '{"cwd":".","tool_input":{"command":"gh auth logout"}}')"
+expect "guard: gh pr view allow"     allow "$(decision cos_bash_guard.py '{"cwd":".","tool_input":{"command":"gh pr view tr-0007"}}')"
+
+# --- ship tool: refuses to run off a transition branch (offline check)
+"$PY" tools/cos_ship.py --render-only >/dev/null 2>&1
+[ "$?" = "1" ] && echo "PASS  ship: refuses on main" || { echo "FAIL  ship: should refuse on main"; FAIL=1; }
 
 # --- stop gate polarity
 echo garbage | "$PY" .claude/hooks/cos_stop_evidence.py >/dev/null 2>&1

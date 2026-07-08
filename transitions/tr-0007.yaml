@@ -1,0 +1,40 @@
+id: tr-0007
+intent: 'Navigation layer per docs/cos-navigation-layer design (owner-resolved):
+  policy/navigation.yaml, tools/cos_ship.py one-command ship pipeline, gh guard
+  rules + harness fixtures, skill ship step, 30-day narrow capability cap-0001
+  with owner ratification'
+requested_by:
+  actor: agent:claude-fable-5
+  office: executor
+capability_id: cap-0001-agent-standing
+targets:
+- policy/navigation.yaml
+- tools/cos_ship.py
+- capabilities/cap-0001-agent-standing.yaml
+- .claude/hooks/cos_bash_guard.py
+- .claude/skills/cos-transition/SKILL.md
+- tools/test_hooks.sh
+- docs/navigation-layer.md
+- evidence/reviews/tr-0007-design-conformance.md
+- evidence/approvals/cap-0001-ratification.md
+- evidence/test_runs/tr-0007-ship-smoke.txt
+- evidence/test_runs/tr-0007-hook-harness.txt
+- evidence/test_runs/tr-0007-validation.txt
+advisory_risk_class: high
+rollback_plan: git revert the tr-0007 commit; no state outside the repo is touched.
+verification_note: >
+  Offline verification (live gh calls run first on the owner's machine, per
+  design: this transition ships itself as cos_ship's first live run):
+  harness PASS including five new gh guard fixtures and the ship refusal
+  check; ship smoke runs show fail-closed dirty/lane refusals and a correct
+  render of the PR body; full validator suite PASS. Outputs at
+  evidence/test_runs/tr-0007-*.txt.
+evidence:
+  reviews:
+  - evidence/reviews/tr-0007-design-conformance.md
+  approvals:
+  - evidence/approvals/cap-0001-ratification.md
+  test_runs:
+  - evidence/test_runs/tr-0007-ship-smoke.txt
+  - evidence/test_runs/tr-0007-hook-harness.txt
+  - evidence/test_runs/tr-0007-validation.txt
