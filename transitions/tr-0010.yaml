@@ -1,0 +1,41 @@
+id: tr-0010
+intent: "Ralph pilot T2: loop scaffolding — machine-checkable backlog with
+  capability_check hard-exclusions (C2, C7), per-iteration prompt with
+  data-not-instructions rule and superset stop conditions (C5, C6),
+  single-iteration runner with tty-acknowledged continuation and hard cap (C1)"
+requested_by:
+  actor: agent:claude-fable-5
+  office: executor
+capability_id: cap-0001-agent-standing
+targets:
+- docs/ralph-backlog.yaml
+- docs/ralph-prompt.md
+- tools/ralph_loop.sh
+- evidence/test_runs/tr-0010-runner-smoke.txt
+- evidence/test_runs/tr-0010-validation.txt
+advisory_risk_class: medium
+rollback_plan: git revert the tr-0010 commit; no state outside the repo is
+  touched. Post-revert effect - backlog, prompt, and runner leave together;
+  nothing else references them yet, so no dangling loci or commands remain.
+verification_note: "Executed in this session: yaml parse plus schema assertions
+  on docs/ralph-backlog.yaml (4 stories; every story pins docs/ralph-backlog.yaml
+  in its own targets; every capability_check hard-excludes constitution/**,
+  secrets/**, capabilities/**; all mandatory fields present); a V4-equivalent
+  line scan of docs/ralph-prompt.md (every must/required/enforced/validated
+  line carries a same-line resolvable locus; no locus-exempt marker taken);
+  bash -n on tools/ralph_loop.sh; an 8-case runner smoke with STUB agent
+  commands only — sentinel-complete rc 0, halt marker rc 3, single-iteration
+  rc 5, waiver-growth rc 3, agent-failure rc 3, usage error rc 6, --continue
+  without tty rc 2, hard cap rc 4 under a script(1) pseudo-tty with emulated
+  y acknowledgments (evidence/test_runs/tr-0010-runner-smoke.txt); bash
+  tools/cos_validate.sh (RESULT in evidence/test_runs/tr-0010-validation.txt).
+  Reasoned, not executed: no live Ralph iteration was run, per the work order —
+  the first live story waits for T3 probe evidence; the default 'claude -p'
+  agent command is unexercised in this sandbox (no claude CLI here). Noted:
+  the pty cap test that proves the acknowledgment path also shows a pty feeder
+  can satisfy it — tty acknowledgment is a deliberate-act gate under the
+  honest-but-fallible threat model, not an adversarial control."
+evidence:
+  test_runs:
+  - evidence/test_runs/tr-0010-runner-smoke.txt
+  - evidence/test_runs/tr-0010-validation.txt
