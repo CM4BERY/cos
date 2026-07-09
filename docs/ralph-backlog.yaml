@@ -86,8 +86,16 @@ stories:
     capability: cap-0001-agent-standing
     require: [all_targets_allowed, none_denied, unexpired_at_pick_time]
     hard_exclude: ["constitution/**", "secrets/**", "capabilities/**"]
-  passes: false
-  learnings: null
+  passes: true
+  learnings: "schemas/amendment.schema.json sets additionalProperties: false
+    and has no expected_effect key, so §4's 'from/to, reason, expected effect,
+    rollback' cannot be four YAML fields: the skill routes expected effect
+    into reason[] and the simulation note into evidence/ referenced from
+    evidence[]. policy/navigation.yaml maps high and critical to review, not
+    flag, so cos_ship.py needs no --bypass on this lane — it opens the PR and
+    stops. Frontmatter goes before the locus-exempt marker, not after it as
+    in cos-transition, or the skill loader reads the HTML comment as the
+    description."
 - id: story-003
   priority: 3
   title: cos-add-validator skill (automation-layer §4)
