@@ -22,6 +22,10 @@ def decide(decision, reason):
 RULES = [
     (r"\bCOS_ALLOW_DANGEROUS\s*=", "deny",
      "COS bash guard: the bypass variable is human-only, set outside the session."),
+    (r"\bcos_ship\.py\b[^\n|;&]*--bypass\b", "deny",
+     "COS bash guard: ship --bypass is human-only, typed outside the session "
+     "(defense-in-depth; the enforcement locus is policy/navigation.yaml "
+     "review lanes)."),
     (r"\bgit\s+push\b[^\n|;&]*(\s--force\b|\s--force-with-lease\b|\s-f\b)", "deny",
      "COS bash guard: force push denied (forbidden: ledger_history_rewrite)."),
     (r"\bgit\s+(filter-branch|filter-repo)\b", "deny",

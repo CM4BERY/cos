@@ -4,11 +4,14 @@ version: "0.1.0"
 expected_account: CMABERY
 merge_method: squash
 delete_branch_after_merge: true
-# Bypass evidence lives where the bypass happens: GitHub's PR timeline, plus
-# a typed reason comment for flag lanes. governance_debt.py (Stage 3) counts
-# bypass-merged PRs by lane.
+# Bypass evidence lives where the bypass happens: GitHub's PR timeline.
+# review lanes: cos_ship opens the PR, watches checks, and stops before
+# merging; a human completes the merge and records the one-line reason as
+# their PR review/merge comment (the typed-comment code path in cos_ship is
+# flag-mode only). governance_debt.py (Stage 3) counts bypass-merged PRs by
+# lane. Decision of record: docs/navigation-layer.md section 7, item 4.
 bypass:
   low: auto        # merge with --admin, no ceremony
   medium: auto
-  high: flag       # requires --bypass "one-line reason"; posted as PR comment
-  critical: flag
+  high: review     # ship stops before merge; a human reviews and completes it
+  critical: review
