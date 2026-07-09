@@ -1,0 +1,32 @@
+id: tr-0015
+intent: "Queue tr-0014's four findings as backlog stories 006-009 (V1
+  review-integrity amendment, stop-gate halt-vs-unvalidated distinction, ship
+  CI-registration retry, cos-transition skill repairs) and reorder priorities
+  so headless-safe stories run before interactive-only and owner-gated ones"
+requested_by:
+  actor: agent:claude-fable-5
+  office: executor
+capability_id: cap-0001-agent-standing
+targets:
+- docs/ralph-backlog.yaml
+- evidence/test_runs/tr-0015-validation.txt
+advisory_risk_class: low
+rollback_plan: git revert the tr-0015 commit; docs-only, no state outside the
+  repo is touched; the four stories leave the queue and priorities return to
+  their tr-0013 values.
+verification_note: "Executed in this session: text-surgery reprioritization
+  asserted block-scoped (exactly one priority line changed per story), then
+  yaml parse plus structural assertions on the result — nine stories, unique
+  priorities, pick order after the two done stories is 005, 008, 003, 004,
+  007, 009, 006; every story pins the backlog in its own targets and carries
+  the standard hard-exclusions; passes flags true only for 001 and 002;
+  story-001/002 learnings untouched (edit is priorities plus appends); bash
+  tools/cos_validate.sh (RESULT in evidence/test_runs/tr-0015-validation.txt).
+  Design note recorded: story-006 is deliberately queued with targets outside
+  cap-0001 — its capability precheck fails until the owner issues a scoped
+  capability, and when it is the only story left the loop halts naming it,
+  which is the intended self-documenting end state of this queue. Reasoned,
+  not executed: none of the four stories' fixes are implemented here."
+evidence:
+  test_runs:
+  - evidence/test_runs/tr-0015-validation.txt
