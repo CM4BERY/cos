@@ -1,0 +1,13 @@
+id: tr-0016
+intent: 'ralph_loop.sh: exclusive single-invocation flock plus tee''d live output,
+  with in-runner smoke fixtures'
+requested_by:
+  actor: agent:claude-fable-5
+  office: executor
+capability_id: cap-0001-agent-standing
+targets:
+- tools/ralph_loop.sh
+- docs/ralph-backlog.yaml
+advisory_risk_class: medium
+rollback_plan: git revert the tr-0016 commit; no state outside the repo is touched.
+verification_note: ''
