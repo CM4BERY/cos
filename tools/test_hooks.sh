@@ -52,6 +52,27 @@ targets: []
 Y
 expect "gate: empty targets fail-closed"    deny  "$(decision cos_write_gate.py '{"cwd":".","tool_input":{"file_path":"docs/harness-probe.md"}}')"
 rm -f transitions/tr-9997.yaml capabilities/cap-9997-harness.yaml "$SESS"
+# --- write gate: expired capability denies (cap-9997 above expires 2099 and
+#     never exercises the expiry branch; this fixture does)
+cat > capabilities/cap-9998-expired.yaml <<'Y'
+id: cap-9998-expired
+issued_by: "harness:fixture"
+issued_to_actor: "agent:claude-fable-5"
+issued_for_office: executor
+allowed_actions: [edit_file]
+allowed_targets:
+- "docs/**"
+issued_at: "2020-01-01T00:00:00Z"
+expires_at: "2020-06-01T00:00:00Z"
+Y
+cat > transitions/tr-9998.yaml <<'Y'
+id: tr-9998
+targets:
+- docs/harness-probe.md
+Y
+printf '{"transition_id":"tr-9998","capability_id":"cap-9998-expired"}' > "$SESS"
+expect "gate: expired capability deny" deny "$(decision cos_write_gate.py '{"cwd":".","tool_input":{"file_path":"docs/harness-probe.md"}}')"
+rm -f transitions/tr-9998.yaml capabilities/cap-9998-expired.yaml "$SESS"
 [ "$PARKED" = 1 ] && mv "$SESS.parked" "$SESS"
 
 # --- bash guard
@@ -62,6 +83,8 @@ expect "guard: plain push ask"    ask   "$(decision cos_bash_guard.py '{"cwd":".
 expect "guard: pip foreign deny"  deny  "$(decision cos_bash_guard.py '{"cwd":".","tool_input":{"command":"pip install requests"}}')"
 expect "guard: pip deps allow"    allow "$(decision cos_bash_guard.py '{"cwd":".","tool_input":{"command":"pip install pyyaml jsonschema"}}')"
 expect "guard: bypass-var deny"   deny  "$(decision cos_bash_guard.py '{"cwd":".","tool_input":{"command":"export COS_ALLOW_DANGEROUS=1"}}')"
+expect "guard: ship bypass deny"  deny  "$(decision cos_bash_guard.py '{"cwd":".","tool_input":{"command":"python3 tools/cos_ship.py --bypass \"x\""}}')"
+expect "guard: ship plain allow"  allow "$(decision cos_bash_guard.py '{"cwd":".","tool_input":{"command":"python3 tools/cos_ship.py"}}')"
 expect "guard: reset-hard deny"   deny  "$(decision cos_bash_guard.py '{"cwd":".","tool_input":{"command":"git reset --hard HEAD~1"}}')"
 expect "guard: garbage fail-closed" deny "$(echo garbage | "$PY" .claude/hooks/cos_bash_guard.py | "$PY" -c "import json,sys; print(json.load(sys.stdin)['hookSpecificOutput']['permissionDecision'])")"
 expect "guard: gh repo delete deny"  deny "$(decision cos_bash_guard.py '{"cwd":".","tool_input":{"command":"gh repo delete CM4BERY/cos --yes"}}')"

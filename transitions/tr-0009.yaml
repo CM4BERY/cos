@@ -1,0 +1,41 @@
+id: tr-0009
+intent: "Ralph pilot T1: install the human gate — flip navigation high/critical
+  lanes from flag to review (C3 primary locus), add ship --bypass guard rule
+  as defense-in-depth, add harness fixtures for the bypass string and the write
+  gate's expired-capability branch (C4 part 2), record the review-mode bypass-reason
+  audit-trail decision"
+requested_by:
+  actor: agent:claude-fable-5
+  office: executor
+capability_id: cap-0001-agent-standing
+targets:
+- policy/navigation.yaml
+- .claude/hooks/cos_bash_guard.py
+- tools/test_hooks.sh
+- docs/navigation-layer.md
+- evidence/reviews/tr-0009-ralph-gate-review.md
+- evidence/test_runs/tr-0009-hook-harness.txt
+- evidence/test_runs/tr-0009-validation.txt
+advisory_risk_class: high
+rollback_plan: git revert the tr-0009 commit; no state outside the repo is touched.
+  Post-revert effect - navigation high/critical lanes return to flag (pre-gate
+  behavior); the guard rule and harness fixtures leave with the same revert.
+verification_note: "Executed in this session: bash tools/test_hooks.sh — HARNESS:
+  ALL PASS (31 assertions, including the three added here: write-gate expired-capability
+  deny, guard ship --bypass deny, guard plain-ship allow control); python3 -m
+  py_compile on the amended guard; yaml parse of the amended navigation.yaml;
+  bash tools/cos_validate.sh (RESULT recorded in evidence/test_runs/tr-0009-validation.txt).
+  Reasoned, not executed: cos_ship's review-mode stop-before-merge branch was
+  not exercised live in this session — it is exercised on this transition's own
+  shipping, where the owner completes the merge. Note: the Ralph pilot design
+  review (READY-WITH-CONDITIONS) is not recorded under evidence/reviews/; its
+  conditions are restated in the work order this transition implements. The
+  independent review file for THIS transition is owner-authored at
+  evidence/reviews/tr-0009-ralph-gate-review.md and absent until the owner
+  writes it."
+evidence:
+  reviews:
+  - evidence/reviews/tr-0009-ralph-gate-review.md
+  test_runs:
+  - evidence/test_runs/tr-0009-hook-harness.txt
+  - evidence/test_runs/tr-0009-validation.txt
