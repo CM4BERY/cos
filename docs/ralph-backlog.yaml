@@ -26,6 +26,11 @@
 #                    inside that transition's own diff, never after the fact (C2)
 #   learnings        null until done; one short note written at flip time
 #
+# Priorities reordered 2026-07-09 (tr-0015): headless-safe stories first
+# (005 lock, 008 ship-retry), interactive .claude/** stories next (003,
+# 004, 007, 009 — the harness write-protects .claude/** in headless mode),
+# owner-gated last (006 — targets outside cap-0001).
+#
 # Out of scope for this backlog (owner acts; outside cap-0001):
 #   - adding the cos_ship command line to CLAUDE.md's Commands section
 version: "0.1.0"
@@ -97,7 +102,7 @@ stories:
     in cos-transition, or the skill loader reads the HTML comment as the
     description."
 - id: story-003
-  priority: 3
+  priority: 5
   title: cos-add-validator skill (automation-layer §4)
   expected_lane: high
   targets:
@@ -121,7 +126,7 @@ stories:
   passes: false
   learnings: null
 - id: story-004
-  priority: 4
+  priority: 6
   title: transition-auditor subagent (automation-layer §6)
   expected_lane: high
   targets:
@@ -145,7 +150,7 @@ stories:
   passes: false
   learnings: null
 - id: story-005
-  priority: 5
+  priority: 3
   title: ralph_loop.sh concurrency lock + live output (race finding, 2026-07-09)
   expected_lane: medium
   targets:
@@ -165,6 +170,106 @@ stories:
     refused; tee produces identical terminal and transcript bytes), stub
     agents only"
   - "no bypass flags introduced; exit codes 0/2/3/4/5/6 keep their meanings"
+  capability_check:
+    capability: cap-0001-agent-standing
+    require: [all_targets_allowed, none_denied, unexpired_at_pick_time]
+    hard_exclude: ["constitution/**", "secrets/**", "capabilities/**"]
+  passes: false
+  learnings: null
+- id: story-006
+  priority: 9
+  title: amendment — make high-lane independent_review real (V1 rubber-stamp gap, tr-0014 finding)
+  expected_lane: high
+  targets:
+  - governance/amendments/A-0002.yaml
+  - validators/validate_capability_scope.py
+  - policy/enforcement_loci.yaml
+  - docs/ralph-backlog.yaml
+  acceptance:
+  - "run the cos-amendment skill (shipped tr-0014): amendment record proposing
+    that independent_review either become computable — the review artifact
+    names the reviewed commit or diff hash and an author distinct from the
+    transition actor, and V1 checks those properties — or relocate its locus
+    honestly to the review-mode merge and reason comment (branch-protection
+    plus governance_debt), removing the file-existence check that an empty or
+    self-authored file satisfies today; simulation note replays tr-0009 and
+    tr-0014 under the proposed rule"
+  - "authority-expansion statement per the skill; the amendment expands
+    nothing for the agent; constitution untouched"
+  - "OWNER-GATED: these targets sit outside cap-0001 (validators/**, policy/**
+    beyond navigation.yaml, governance/**), so the capability precheck fails
+    by design until the owner issues a scoped capability for this story"
+  capability_check:
+    capability: cap-0001-agent-standing
+    require: [all_targets_allowed, none_denied, unexpired_at_pick_time]
+    hard_exclude: ["constitution/**", "secrets/**", "capabilities/**"]
+  passes: false
+  learnings: null
+- id: story-007
+  priority: 7
+  title: stop gate — distinguish halted-at-gate from unvalidated (tr-0014 finding)
+  expected_lane: high
+  targets:
+  - .claude/hooks/cos_stop_evidence.py
+  - tools/test_hooks.sh
+  - docs/ralph-backlog.yaml
+  acceptance:
+  - "ending a turn on a FRESH validation marker whose digest matches the tree
+    is permitted without a waiver even when its result is FAIL — a transition
+    honestly held at a human gate is not an unvalidated stop; ending with a
+    stale or absent marker still blocks once, then logs the waiver on the
+    identical second stop"
+  - "harness fixtures for both branches (fresh-FAIL allowed; stale and absent
+    blocked), stub payloads only; bash tools/test_hooks.sh ends HARNESS: ALL
+    PASS"
+  - "note: interactive run — the harness write-protects .claude/** headless;
+    four historical waiver lines in the pilot clone's .cos/waivers.log predate
+    this fix and partly measure the old conflation"
+  capability_check:
+    capability: cap-0001-agent-standing
+    require: [all_targets_allowed, none_denied, unexpired_at_pick_time]
+    hard_exclude: ["constitution/**", "secrets/**", "capabilities/**"]
+  passes: false
+  learnings: null
+- id: story-008
+  priority: 4
+  title: cos_ship — treat unregistered checks as pending, not failing (race seen on PR 7 and PR 8)
+  expected_lane: medium
+  targets:
+  - tools/cos_ship.py
+  - tools/test_hooks.sh
+  - docs/ralph-backlog.yaml
+  acceptance:
+  - "when gh reports no recognizable check summary immediately after PR
+    creation, ship retries within its existing bounded pending loop instead
+    of hard-refusing on 'unknown'; a real failing or cancelled check still
+    refuses; auto lanes still never merge on anything but green"
+  - "offline harness assertions cover the new classification path alongside
+    the existing classify_checks cases; bash tools/test_hooks.sh ends
+    HARNESS: ALL PASS"
+  capability_check:
+    capability: cap-0001-agent-standing
+    require: [all_targets_allowed, none_denied, unexpired_at_pick_time]
+    hard_exclude: ["constitution/**", "secrets/**", "capabilities/**"]
+  passes: false
+  learnings: null
+- id: story-009
+  priority: 8
+  title: cos-transition skill repairs — frontmatter first, review-mode step 11 (tr-0014 finding)
+  expected_lane: high
+  targets:
+  - .claude/skills/cos-transition/SKILL.md
+  - docs/ralph-backlog.yaml
+  acceptance:
+  - "the YAML frontmatter opens the file so the skill loader reads name and
+    description correctly; the cos:locus-exempt-file marker moves below the
+    frontmatter (V4 honors the marker anywhere in the file)"
+  - "step 11 matches shipped reality: high and critical lanes stop before
+    merge for a human reviewer per policy/navigation.yaml; the stale
+    --bypass instruction, which cos_bash_guard.py denies outright, is
+    removed"
+  - "harness skill-hygiene checks pass; note: interactive run — the harness
+    write-protects .claude/** headless"
   capability_check:
     capability: cap-0001-agent-standing
     require: [all_targets_allowed, none_denied, unexpired_at_pick_time]
