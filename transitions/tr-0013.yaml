@@ -1,0 +1,31 @@
+id: tr-0013
+intent: "Ralph pilot close-out: queue runner-concurrency story-005 in the
+  backlog (flock single-invocation lock + tee-to-terminal, from the live race
+  finding of 2026-07-09) and refresh docs/status.md as the durable
+  context-recovery point for the post-pilot repo"
+requested_by:
+  actor: agent:claude-fable-5
+  office: executor
+capability_id: cap-0001-agent-standing
+targets:
+- docs/ralph-backlog.yaml
+- docs/status.md
+- evidence/test_runs/tr-0013-validation.txt
+advisory_risk_class: low
+rollback_plan: git revert the tr-0013 commit; docs-only, no state outside the
+  repo is touched; story-005 disappears from the queue and status.md returns
+  to its tr-0008 edition.
+verification_note: "Executed in this session: yaml parse plus structural
+  assertions on the appended backlog (five stories, unique priorities,
+  story-005 pins the backlog in its own targets and carries the standard
+  hard-exclusions; story-001's merged learnings untouched — the edit is
+  append-only); a V4-equivalent line scan of the rewritten docs/status.md
+  (no normative trigger word without a locus); bash tools/cos_validate.sh
+  (RESULT in evidence/test_runs/tr-0013-validation.txt). Two edits ride in
+  one transition deliberately: both are docs-lane record-keeping of the same
+  session's learnings, and one auto-lane ship halves the owner's round trips.
+  Reasoned, not executed: story-005's flock/tee behavior is acceptance
+  criteria for a future iteration, not implemented here."
+evidence:
+  test_runs:
+  - evidence/test_runs/tr-0013-validation.txt

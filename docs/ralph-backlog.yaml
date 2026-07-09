@@ -136,3 +136,30 @@ stories:
     hard_exclude: ["constitution/**", "secrets/**", "capabilities/**"]
   passes: false
   learnings: null
+- id: story-005
+  priority: 5
+  title: ralph_loop.sh concurrency lock + live output (race finding, 2026-07-09)
+  expected_lane: medium
+  targets:
+  - tools/ralph_loop.sh
+  - docs/ralph-backlog.yaml
+  acceptance:
+  - "single-invocation lock: the runner takes an exclusive flock on
+    .cos/ralph/lock for the whole invocation; a second concurrent invocation
+    exits immediately with a new distinct exit code and a one-line message
+    naming the live run's transcript — origin: on 2026-07-09 two concurrent
+    invocations raced over the same scaffold (tr-0012) until one halted
+    itself; see .cos/ralph transcripts 040130Z (halt) and 040819Z (survivor)"
+  - "live output: the agent's output streams to the terminal AND the
+    transcript file (tee), so a silent terminal no longer invites a second
+    launch"
+  - "runner smoke fixtures extended for both behaviors (lock contention
+    refused; tee produces identical terminal and transcript bytes), stub
+    agents only"
+  - "no bypass flags introduced; exit codes 0/2/3/4/5/6 keep their meanings"
+  capability_check:
+    capability: cap-0001-agent-standing
+    require: [all_targets_allowed, none_denied, unexpired_at_pick_time]
+    hard_exclude: ["constitution/**", "secrets/**", "capabilities/**"]
+  passes: false
+  learnings: null
