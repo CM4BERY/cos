@@ -106,6 +106,47 @@ assert c('1 cancelled, 0 failing, 1 successful, 0 skipped, and 0 pending checks'
 assert c('gibberish') == 'unknown'
 " >/dev/null 2>&1 && echo "PASS  ship: classify_checks" || { echo "FAIL  ship: classify_checks"; FAIL=1; }
 
+# --- governance debt tool: seeded breach detected FIRST (failing-first),
+#     then the healthy repo, then byte-determinism (story-001 acceptance).
+#     Seeded temp repo carries two breaches: a ledger event stamped outside
+#     its capability window, and a review-mode PR merge whose event evidence
+#     has no evidence/reviews/ file.
+GD_TMP=$(mktemp -d)
+git -C "$GD_TMP" init -q
+git -C "$GD_TMP" checkout -q -b main
+mkdir -p "$GD_TMP/ledger" "$GD_TMP/capabilities" "$GD_TMP/policy"
+cat > "$GD_TMP/capabilities/cap-9001-lapsed.yaml" <<'Y'
+id: cap-9001-lapsed
+issued_at: "2020-01-01T00:00:00Z"
+expires_at: "2020-02-01T00:00:00Z"
+Y
+cat > "$GD_TMP/policy/navigation.yaml" <<'Y'
+bypass:
+  low: auto
+  medium: auto
+  high: review
+  critical: review
+Y
+printf '%s\n' '{"event_id": "evt-9001", "timestamp": "2026-01-01T00:00:00Z", "transition_id": "tr-9001", "capability_id": "cap-9001-lapsed", "risk_class": "high", "decision": "require_review", "evidence": []}' > "$GD_TMP/ledger/events.ndjson"
+git -C "$GD_TMP" add -A
+git -C "$GD_TMP" -c user.name=harness -c user.email=h@cos.local -c commit.gpgsign=false commit -qm "seed state"
+git -C "$GD_TMP" -c user.name=harness -c user.email=h@cos.local -c commit.gpgsign=false commit -q --allow-empty -m "tr-9001: seeded review merge, no reason [evt-9001] (#1)"
+GD_SEEDED=$("$PY" tools/governance_debt.py --repo "$GD_TMP" 2>&1)
+expect "debt: seeded breach rc 1 (failing-first)" 1 "$?"
+echo "$GD_SEEDED" | grep -q "outside cap-9001-lapsed window" \
+  && echo "PASS  debt: expired-capability event named" \
+  || { echo "FAIL  debt: expired-capability event not named"; FAIL=1; }
+echo "$GD_SEEDED" | grep -q "no existing evidence/reviews/ file" \
+  && echo "PASS  debt: review merge lacking reason named" \
+  || { echo "FAIL  debt: review merge lacking reason not named"; FAIL=1; }
+rm -rf "$GD_TMP"
+GD_A=$("$PY" tools/governance_debt.py 2>&1)
+expect "debt: healthy repo rc 0" 0 "$?"
+GD_B=$("$PY" tools/governance_debt.py 2>&1)
+expect "debt: healthy verdict line" "GOVERNANCE DEBT: OK (0 breaches)" "$(echo "$GD_A" | tail -1)"
+[ "$GD_A" = "$GD_B" ] && echo "PASS  debt: deterministic output (two runs identical)" \
+  || { echo "FAIL  debt: output differs across runs"; FAIL=1; }
+
 # --- stop gate polarity
 echo garbage | "$PY" .claude/hooks/cos_stop_evidence.py >/dev/null 2>&1
 expect "stop: garbage fail-open (rc 0)" 0 "$?"

@@ -57,8 +57,14 @@ stories:
     capability: cap-0001-agent-standing
     require: [all_targets_allowed, none_denied, unexpired_at_pick_time]
     hard_exclude: ["constitution/**", "secrets/**", "capabilities/**"]
-  passes: false
-  learnings: null
+  passes: true
+  learnings: "cos_append_event.py folds evidence paths into the event's
+    targets and writes no evidence field, so the review-reason proxy scans
+    targets plus the transition record's evidence block; lane modes are read
+    via git show at each merge commit so later policy flips cannot
+    reclassify history; the session allowlist ask-gates direct runs of new
+    tools, so bash tools/test_hooks.sh is the only sanctioned execution
+    path until the owner allowlists the new command."
 - id: story-002
   priority: 2
   title: cos-amendment skill (automation-layer §4)
