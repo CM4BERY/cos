@@ -1,0 +1,19 @@
+$ bash tools/cos_validate.sh
+(run in-session 2026-07-09, branch tr-0012, after evt-0013 was appended;
+transcript copied verbatim from the tool output)
+
+cos-validate: base=origin/main head=WORKTREE
+[PASS] validate_ledger
+[PASS] validate_schemas
+[PASS] validate_capability_scope
+[PASS] validate_enforcement_claims
+       warn: .claude/skills/cos-transition/SKILL.md: locus-exempt file (non-normative by declaration)
+       warn: docs/automation-layer.md: locus-exempt file (non-normative by declaration)
+       warn: docs/navigation-layer.md: locus-exempt file (non-normative by declaration)
+       warn: docs/target-architecture.md: locus-exempt file (non-normative by declaration)
+[PASS] validate_no_self_approval
+RESULT: ALL PASS -- transition may commit
+
+A final validation run over the complete transition state (including this
+evidence file) follows this capture; its RESULT line is quoted in the
+transition's closing report.

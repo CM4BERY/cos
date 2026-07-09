@@ -1,0 +1,42 @@
+id: tr-0012
+intent: "Ralph story-001: governance_debt.py \u2014 deterministic bypass/debt\
+  \ report from repo-local state (git history of main + ledger + waivers), hard\
+  \ thresholds exit nonzero; failing-first fixtures in test_hooks.sh; flip story-001\
+  \ passes inside this diff"
+requested_by:
+  actor: agent:claude-fable-5
+  office: executor
+capability_id: cap-0001-agent-standing
+targets:
+- tools/governance_debt.py
+- tools/test_hooks.sh
+- docs/ralph-backlog.yaml
+advisory_risk_class: medium
+rollback_plan: git revert the tr-0012 commit; no state outside the repo is
+  touched. Post-revert effect - the tool, its harness fixtures, and the
+  story-001 passes-flip leave together; nothing else invokes
+  governance_debt.py yet (the ledger-analyst subagent that must quote it is
+  future Stage 3 work), so no dangling loci or commands remain.
+verification_note: "Executed in this session: bash tools/test_hooks.sh ends
+  HARNESS: ALL PASS (38 assertions) including six new governance-debt
+  fixtures - failing-first proven by a seeded temp repo carrying an event
+  stamped outside its capability window plus a review-mode PR merge with no
+  evidence/reviews/ file (rc 1, both breaches named by grep) asserted BEFORE
+  the healthy-repo assertions (rc 0; final line GOVERNANCE DEBT: OK (0
+  breaches); byte-identical output across two runs). Healthy-repo report as
+  exercised through the harness: 12 commits / 12 events on origin/main;
+  bypass-merged PRs low 1, medium 1; pre-navigation merge 1; direct pushes 8;
+  review-mode merges 1 (reason recorded via evidence/reviews file on the
+  event); expired-capability events 0; logged waivers 2 (informational -
+  their halt locus is the stop hook). Transcript:
+  evidence/test_runs/tr-0012-hook-harness.txt. Reasoned, not executed:
+  direct python3 tools/governance_debt.py runs are permission-ask-gated by
+  the session allowlist (.claude/settings.local.json), so every execution
+  went through the allowlisted harness command; CI checks out with
+  fetch-depth 0 so origin/main resolves there, and the tool names its ref
+  and falls back origin/main -> main -> HEAD when absent. Dependencies:
+  python3 stdlib + pyyaml only."
+evidence:
+  test_runs:
+  - evidence/test_runs/tr-0012-hook-harness.txt
+  - evidence/test_runs/tr-0012-validation.txt
