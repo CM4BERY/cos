@@ -1,0 +1,45 @@
+id: tr-0020
+intent: >-
+  Issue the owner-ratified 72-hour cap-0003-review-integrity-amendment to
+  agent:codex, while keeping publication and the exact future ruleset mutation
+  under separate human-owner control and making merge of this issuance a hard
+  prerequisite for any tr-0021 work
+requested_by:
+  actor: agent:codex
+  office: executor
+capability_id: cap-0003-review-integrity-amendment
+targets:
+  - capabilities/cap-0003-review-integrity-amendment.yaml
+  - evidence/approvals/cap-0003-review-integrity-ratification.md
+  - evidence/approvals/cap-0003-owner-publication-authorization.md
+  - evidence/approvals/tr-0021-ruleset-mutation-authorization.md
+  - evidence/reviews/tr-0020-capability-scope-review.md
+  - evidence/test_runs/tr-0020-validation.txt
+advisory_risk_class: high
+rollback_plan: >-
+  Before tr-0021 begins, revert the tr-0020 squash commit to remove cap-0003.
+  If any authority has already been exercised, do not silently reactivate or
+  rewrite history: carry an owner-ratified revocation through a new governed
+  transition. tr-0020 changes no GitHub App, pull request, ruleset, branch, or
+  repository setting, so it has no external-state rollback.
+verification_note: >-
+  Executed on the complete issuance candidate and again after the direct owner
+  operator addendum: capability and transition schemas PASS; every tr-0020
+  target is allowlisted; agent publication authority is limited to authenticating
+  the exact App and invoking cos_ship for the frozen tr-0020 candidate, with no
+  merge, bypass, ruleset update, other-branch publication, or tr-0021 publication;
+  evt-0020 was appended by tools/cos_append_event.py with computed high risk;
+  git diff --cached --check is clean; bash tools/test_hooks.sh ends HARNESS: ALL
+  PASS; and BASE=origin/main bash tools/cos_validate.sh ends RESULT: ALL PASS --
+  transition may commit. Exact output is recorded in
+  evidence/test_runs/tr-0020-validation.txt. No external state changed during
+  candidate construction or re-freeze, and tr-0021 has not begun.
+evidence:
+  approvals:
+    - evidence/approvals/cap-0003-review-integrity-ratification.md
+    - evidence/approvals/cap-0003-owner-publication-authorization.md
+    - evidence/approvals/tr-0021-ruleset-mutation-authorization.md
+  reviews:
+    - evidence/reviews/tr-0020-capability-scope-review.md
+  test_runs:
+    - evidence/test_runs/tr-0020-validation.txt

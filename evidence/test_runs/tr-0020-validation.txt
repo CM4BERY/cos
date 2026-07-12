@@ -1,0 +1,126 @@
+tr-0020 capability-issuance verification
+Date: 2026-07-12
+Base: origin/main at dbe22878af60bd00d19c2377149c1996bcf90eed
+Head: staged WORKTREE on tr-0020
+
+Preflight schema and scope assertions:
+
+  PASS schema: capabilities/cap-0003-review-integrity-amendment.yaml
+  PASS schema: transitions/tr-0020.yaml
+  PASS scope: every tr-0020 target allowed
+  PASS boundary at initial freeze: no agent publication/merge/ruleset-update action
+  PASS window: 2026-07-12T14:20:47Z -> 2026-07-15T14:20:47Z
+
+Ledger append, executed only through tools/cos_append_event.py:
+
+  event_id: evt-0020
+  prev: evt-0019
+  timestamp: 2026-07-12T14:24:39Z
+  actor: agent:codex
+  transition: tr-0020
+  capability: cap-0003-review-integrity-amendment
+  computed risk: high
+  decision: require_review
+
+Command: git diff --cached --check
+Result: PASS (no output)
+
+Command: bash tools/test_hooks.sh
+Observed assertions:
+
+  PASS  gate: ledger deny
+  PASS  gate: secrets deny
+  PASS  gate: constitution ask
+  PASS  gate: no-session deny
+  PASS  gate: record path allow
+  PASS  gate: garbage fail-closed
+  PASS  gate: in-target allow (col-0 list)
+  PASS  gate: out-of-target deny
+  PASS  gate: empty targets fail-closed
+  PASS  gate: expired capability deny
+  PASS  guard: force-push deny
+  PASS  guard: ledger redirect deny
+  PASS  guard: append tool allow
+  PASS  guard: plain push ask
+  PASS  guard: pip foreign deny
+  PASS  guard: pip deps allow
+  PASS  guard: bypass-var deny
+  PASS  guard: ship bypass deny
+  PASS  guard: ship plain allow
+  PASS  guard: reset-hard deny
+  PASS  guard: garbage fail-closed
+  PASS  guard: gh repo delete deny
+  PASS  guard: gh api DELETE deny
+  PASS  guard: manual gh merge ask
+  PASS  guard: gh auth logout ask
+  PASS  guard: gh pr view allow
+  PASS  ship: refuses on main
+  PASS  ship: classify_checks
+  PASS  ship: App scope and credential isolation
+  PASS  ship: governed App policy and human CODEOWNER
+  PASS  debt: seeded breach rc 1 (failing-first)
+  PASS  debt: expired-capability event named
+  PASS  debt: review merge lacking reason named
+  PASS  debt: healthy repo rc 0
+  PASS  debt: healthy verdict line
+  PASS  debt: deterministic output (two runs identical)
+  PASS  stop: garbage fail-open (rc 0)
+  PASS  settings.json parses
+  PASS  skill hygiene: .claude/skills/cos-amendment/SKILL.md
+  PASS  skill hygiene: .claude/skills/cos-transition/SKILL.md
+  HARNESS: ALL PASS
+
+Command: BASE=origin/main bash tools/cos_validate.sh
+Observed output:
+
+  cos-validate: base=origin/main head=WORKTREE
+  [PASS] validate_ledger
+  [PASS] validate_schemas
+  [PASS] validate_capability_scope
+  [PASS] validate_enforcement_claims
+         warn: .claude/skills/cos-amendment/SKILL.md: locus-exempt file (non-normative by declaration)
+         warn: .claude/skills/cos-transition/SKILL.md: locus-exempt file (non-normative by declaration)
+         warn: docs/automation-layer.md: locus-exempt file (non-normative by declaration)
+         warn: docs/navigation-layer.md: locus-exempt file (non-normative by declaration)
+         warn: docs/target-architecture.md: locus-exempt file (non-normative by declaration)
+  [PASS] validate_no_self_approval
+  RESULT: ALL PASS -- transition may commit
+
+At completion of this initial validation, no push, pull request, merge, App
+authentication, or ruleset mutation had been performed. tr-0021 had not begun.
+
+Owner operator-exception re-freeze
+Date: 2026-07-12
+
+After the initial frozen candidate was presented, human:boss directly
+authorized agent:codex to authenticate the exact configured GitHub App and
+invoke cos_ship for tr-0020 only. The exception permits the App push, draft-PR
+creation or resumption, and check observation; it permits no merge, bypass,
+ruleset update, other-branch publication, or tr-0021 publication. The
+capability, ratification, publication authorization, and independent review
+were updated consistently before these checks ran.
+
+Command: git diff --check
+Result: PASS (no output)
+
+Command: bash tools/test_hooks.sh
+Result: HARNESS: ALL PASS (40 assertions)
+
+Command: BASE=origin/main bash tools/cos_validate.sh
+Observed output:
+
+  cos-validate: base=origin/main head=WORKTREE
+  [PASS] validate_ledger
+  [PASS] validate_schemas
+  [PASS] validate_capability_scope
+  [PASS] validate_enforcement_claims
+         warn: .claude/skills/cos-amendment/SKILL.md: locus-exempt file (non-normative by declaration)
+         warn: .claude/skills/cos-transition/SKILL.md: locus-exempt file (non-normative by declaration)
+         warn: docs/automation-layer.md: locus-exempt file (non-normative by declaration)
+         warn: docs/navigation-layer.md: locus-exempt file (non-normative by declaration)
+         warn: docs/target-architecture.md: locus-exempt file (non-normative by declaration)
+  [PASS] validate_no_self_approval
+  RESULT: ALL PASS -- transition may commit
+
+No external state changed during this re-freeze. App authentication and
+publication remain separate post-commit actions, and tr-0021 has not begun.
