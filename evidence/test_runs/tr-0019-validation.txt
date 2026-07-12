@@ -1,0 +1,39 @@
+tr-0019 capability revocation validation
+date_utc: 2026-07-12
+base: origin/main (ba6d437980123a1e22d187266018de662f76accc)
+
+STATIC REVOCATION ASSERTIONS
+expiry_equals_evt_0019_timestamp: PASS
+inclusive_event_window: PASS
+capability_delta_is_authority_reduction_only: PASS
+event_chain_and_identity: PASS
+target_scope_and_denials: PASS
+rollback_requires_new_owner_issuance: PASS
+
+HOOK HARNESS
+command: bash tools/test_hooks.sh
+result: HARNESS: ALL PASS (40 PASS assertions)
+
+FIVE-VALIDATOR COS SUITE
+command: BASE=origin/main bash tools/cos_validate.sh
+output:
+cos-validate: base=origin/main head=WORKTREE
+[PASS] validate_ledger
+[PASS] validate_schemas
+[PASS] validate_capability_scope
+[PASS] validate_enforcement_claims
+       warn: .claude/skills/cos-amendment/SKILL.md: locus-exempt file (non-normative by declaration)
+       warn: .claude/skills/cos-transition/SKILL.md: locus-exempt file (non-normative by declaration)
+       warn: docs/automation-layer.md: locus-exempt file (non-normative by declaration)
+       warn: docs/navigation-layer.md: locus-exempt file (non-normative by declaration)
+       warn: docs/target-architecture.md: locus-exempt file (non-normative by declaration)
+[PASS] validate_no_self_approval
+RESULT: ALL PASS -- transition may commit
+
+GOVERNANCE DEBT
+command: python3 tools/governance_debt.py --ref HEAD
+summary:
+PR merges with no ledger link: 0
+review-mode merges lacking recorded reason: 0
+expired-capability events: 0
+result: GOVERNANCE DEBT: OK (0 breaches)

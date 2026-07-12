@@ -1,0 +1,34 @@
+id: tr-0019
+intent: Revoke cap-0002-publisher-transition immediately after successful completion
+  of its tr-0018 publisher task, reducing residual authority instead of waiting
+  for scheduled expiry
+requested_by:
+  actor: agent:claude-fable-5
+  office: executor
+capability_id: cap-0002-publisher-transition
+targets:
+- capabilities/cap-0002-publisher-transition.yaml
+- evidence/approvals/cap-0002-revocation-ratification.md
+- evidence/reviews/tr-0019-capability-revocation-review.md
+- evidence/test_runs/tr-0019-validation.txt
+advisory_risk_class: high
+rollback_plan: >-
+  Do not automatically revert this revocation, because restoring the prior
+  expiry would reactivate authority. If publisher-transition authority is
+  needed again, the human owner issues a new narrow capability through a new
+  governed transition. No external GitHub App or ruleset state changes here.
+verification_note: >-
+  Executed in this transition: evt-0019 appended as capability_revoked; the
+  expiry equals its timestamp exactly; independent authority-reduction review
+  READY; bash tools/test_hooks.sh ends HARNESS: ALL PASS (40 assertions); and
+  BASE=origin/main bash tools/cos_validate.sh ends RESULT: ALL PASS --
+  transition may commit (all five validators). The committed candidate's
+  governance debt report ends GOVERNANCE DEBT: OK (0 breaches). Exact output
+  is in evidence/test_runs/tr-0019-validation.txt.
+evidence:
+  approvals:
+  - evidence/approvals/cap-0002-revocation-ratification.md
+  reviews:
+  - evidence/reviews/tr-0019-capability-revocation-review.md
+  test_runs:
+  - evidence/test_runs/tr-0019-validation.txt
