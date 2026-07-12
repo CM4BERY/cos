@@ -1,0 +1,41 @@
+# Human-issued capability declaring the GitHub App publisher transition as
+# its task. COS v0 enforces holder, validity window, and target paths; task_id,
+# office, and action names remain documentary and the high-lane human review
+# is their compensating gate. All capability files other than this exact
+# instrument remain outside the allowlist. Ratification is recorded in
+# evidence/approvals/cap-0002-publisher-transition-ratification.md.
+id: cap-0002-publisher-transition
+issued_by: "human:boss <coltonmabery@gmail.com>"
+issued_to_actor: "agent:claude-fable-5"
+issued_for_office: executor
+task_id: tr-0018
+allowed_actions:
+  - create_file
+  - edit_file
+  - run_validators
+  - run_ship
+allowed_targets:
+  - "capabilities/cap-0002-publisher-transition.yaml"
+  - "tools/cos_ship.py"
+  - "tools/test_hooks.sh"
+  - "policy/navigation.yaml"
+  - "policy/enforcement_loci.yaml"
+  - ".github/CODEOWNERS"
+  - "governance/amendments/A-0002.yaml"
+  - "docs/navigation-layer.md"
+  - "docs/status.md"
+  - "transitions/**"
+  - "ledger/events.ndjson"
+  - "evidence/**"
+denied_targets:
+  - "secrets/**"
+  - "constitution/**"
+issued_at: "2026-07-12T10:42:53Z"
+expires_at: "2026-07-19T10:42:53Z"
+revocable: true
+notes: >-
+  Seven-day authority declared for tr-0018: transition the COS publisher to
+  the cm4bery-cos-executor GitHub App while preserving human review and
+  keeping constitution, secrets, and every other capability file out of
+  scope. COS v0 technically enforces actor, time, and targets; task_id,
+  office, and allowed_actions are documentary.
