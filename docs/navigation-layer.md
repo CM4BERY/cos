@@ -1,6 +1,8 @@
 <!-- cos:locus-exempt-file -->
 > Owner-resolved design for the navigation layer (decisions in section 7).
 > Narrative spec: binding rules live in policy/navigation.yaml and the hooks.
+> Section 8 supersedes the human-token and auto-merge portions of sections
+> 2-4 after the owner-ratified GitHub App rollout.
 
 # COS Navigation Layer — Design for Reaction
 
@@ -82,3 +84,47 @@ Acceptance test — pleasingly circular: the transition that ships `cos_ship` is
 4. (2026-07-08, Ralph pilot T1 — supersedes the flag-lane description in §4 for high/critical.) High and critical lanes flip from `flag` to `review`: `cos_ship` opens the PR, watches checks, and **stops before merging**; a human completes the merge. Audit-trail replacement, recorded because the typed-bypass comment of decision 1 is a flag-mode-only code path in `cos_ship.py` and never fires in review mode: **the human completing a review-mode merge records the one-line reason as their PR review/merge comment**; `governance_debt.py` (Stage 3) counts those exactly as it would have counted tool-posted bypass comments. Decision 1 remains in force for any lane still configured `flag` (currently none).
 
 One consequence of solo bypass to engineer around, recorded here so the build honors it: `--admin` bypasses *all* platform requirements, including the required status check. The check-gate therefore moves into the tool for bypassed merges — step 5 (`gh pr checks --watch`) is mandatory and the tool refuses to reach the merge step on anything but green. The platform guarantees it for reviewed merges; the deterministic tool guarantees it for bypassed ones; both paths are auditable after the fact by replaying validators over history.
+
+## 8. GitHub App publisher and universal human review (2026-07-12)
+
+Amendment `A-0002` replaces the human-token publisher with the private
+`cm4bery-cos-executor` GitHub App. Identity roles are now deliberately
+separate:
+
+| Identity | Role |
+|---|---|
+| `CM4BERY` | Organization and repository owner |
+| `CMABERY` | Human root authority and CODEOWNER |
+| `cm4bery-cos-executor[bot]` | Branch publisher and draft-PR author |
+
+`cos_ship` has no dependency on the human's stored `gh` session. Each run:
+
+1. reads the App metadata and non-secret installation identifiers from
+   `policy/navigation.yaml`;
+2. checks the local PEM owner and mode at
+   `~/.config/cos/cos-executor.pem` without copying it into the repository;
+3. signs a nine-minute RS256 App JWT with `openssl`;
+4. verifies the App id/slug, installation id/owner, and selected-repository
+   posture through GitHub's API;
+5. mints an installation token, queries `/installation/repositories`, and
+   requires the exact repository `CM4BERY/cos` plus the exact six-permission
+   map encoded in policy;
+6. injects the token only into child-process environments for `gh` and an
+   HTTPS rewrite of Git's existing SSH origin; and
+7. revokes the token on success, refusal, or exception.
+
+The tool never writes the token to disk, Git configuration, command
+arguments, transition evidence, or logs. `--auth-smoke` performs the same
+mint/scope-check/revoke sequence with one read-only repository probe.
+
+Initial merge policy is intentionally uniform: low, medium, high, and
+critical all map to `review`; pull requests are drafts; and
+`allow_admin_merge` is false. The App pushes a feature branch, opens the PR,
+watches validation, and stops. `CMABERY` reviews and normally merges it.
+The App is not a ruleset bypass actor, and repository code has no path for
+granting that platform authority.
+
+Rollback is asymmetric by design: reverting `tr-0018` stops COS from using
+the App, while the external installation remains inert until the human owner
+suspends or removes it. No workflow, secret, organization, or ruleset setting
+is modified by the transition.

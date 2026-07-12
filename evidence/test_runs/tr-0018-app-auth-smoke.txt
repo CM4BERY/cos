@@ -1,0 +1,26 @@
+tr-0018 GitHub App authentication smoke
+Date: 2026-07-12
+Command: python3 tools/cos_ship.py --auth-smoke
+
+Attempt 1 (failing-first):
+SHIP: REFUSED: installation token repository scope differs from policy: []
+
+Finding: GitHub's installation-token creation response omitted its optional
+repositories array. The failure path revoked that token, as shown by the
+original scope error remaining the terminal error rather than a revocation
+error. The implementation was changed to query the authenticated
+/installation/repositories endpoint and require total_count=1 plus the exact
+full name CM4BERY/cos.
+
+Attempt 2 (API scope and repository probe):
+SHIP: auth smoke: cm4bery-cos-executor[bot] -> CM4BERY/cos (selected repository; exact permissions verified; expires 2026-07-12T12:01:57Z)
+SHIP: installation token revoked
+
+Attempt 3 (final child-process path):
+SHIP: auth smoke: cm4bery-cos-executor[bot] -> CM4BERY/cos (selected repository; exact permissions; gh + Git HTTPS verified; expires 2026-07-12T12:04:20Z)
+SHIP: installation token revoked
+
+Result: PASS. The private key and all token values were never printed or
+written to repository state. The final token performed read-only repository
+metadata, `gh api`, and HTTPS `git ls-remote` probes through the same child
+process environments used for shipping, then was revoked immediately.

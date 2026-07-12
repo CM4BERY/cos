@@ -1,0 +1,47 @@
+tr-0018 hook and publisher harness
+Date: 2026-07-12
+Command: bash tools/test_hooks.sh
+
+PASS  gate: ledger deny
+PASS  gate: secrets deny
+PASS  gate: constitution ask
+PASS  gate: no-session deny
+PASS  gate: record path allow
+PASS  gate: garbage fail-closed
+PASS  gate: in-target allow (col-0 list)
+PASS  gate: out-of-target deny
+PASS  gate: empty targets fail-closed
+PASS  gate: expired capability deny
+PASS  guard: force-push deny
+PASS  guard: ledger redirect deny
+PASS  guard: append tool allow
+PASS  guard: plain push ask
+PASS  guard: pip foreign deny
+PASS  guard: pip deps allow
+PASS  guard: bypass-var deny
+PASS  guard: ship bypass deny
+PASS  guard: ship plain allow
+PASS  guard: reset-hard deny
+PASS  guard: garbage fail-closed
+PASS  guard: gh repo delete deny
+PASS  guard: gh api DELETE deny
+PASS  guard: manual gh merge ask
+PASS  guard: gh auth logout ask
+PASS  guard: gh pr view allow
+PASS  ship: refuses on main
+PASS  ship: classify_checks
+PASS  ship: App scope and credential isolation
+PASS  ship: governed App policy and human CODEOWNER
+PASS  debt: seeded breach rc 1 (failing-first)
+PASS  debt: expired-capability event named
+PASS  debt: review merge lacking reason named
+PASS  debt: healthy repo rc 0
+PASS  debt: healthy verdict line
+PASS  debt: deterministic output (two runs identical)
+PASS  stop: garbage fail-open (rc 0)
+PASS  settings.json parses
+PASS  skill hygiene: .claude/skills/cos-amendment/SKILL.md
+PASS  skill hygiene: .claude/skills/cos-transition/SKILL.md
+HARNESS: ALL PASS
+
+Result: PASS (40 assertions).

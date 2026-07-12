@@ -94,17 +94,208 @@ expect "guard: gh auth logout ask"   ask  "$(decision cos_bash_guard.py '{"cwd":
 expect "guard: gh pr view allow"     allow "$(decision cos_bash_guard.py '{"cwd":".","tool_input":{"command":"gh pr view tr-0007"}}')"
 
 # --- ship tool: refuses to run off a transition branch (offline check)
-"$PY" tools/cos_ship.py --render-only >/dev/null 2>&1
+SHIP_MAIN_TMP=$(mktemp -d)
+git -C "$SHIP_MAIN_TMP" init -q
+git -C "$SHIP_MAIN_TMP" checkout -q -b main
+GIT_DIR="$SHIP_MAIN_TMP/.git" GIT_WORK_TREE="$SHIP_MAIN_TMP" \
+  "$PY" tools/cos_ship.py --render-only >/dev/null 2>&1
 [ "$?" = "1" ] && echo "PASS  ship: refuses on main" || { echo "FAIL  ship: should refuse on main"; FAIL=1; }
+rm -rf "$SHIP_MAIN_TMP"
 "$PY" -c "
 import sys; sys.path.insert(0, 'tools')
-from cos_ship import classify_checks as c
+from cos_ship import (
+    authenticated_environments,
+    classify_checks as c,
+    validate_installation_scope,
+)
 assert c('0 cancelled, 0 failing, 1 successful, 0 skipped, and 0 pending checks') == 'green'
 assert c('0 cancelled, 0 failing, 1 successful, 0 skipped, and 2 pending checks') == 'pending'
 assert c('0 cancelled, 1 failing, 0 successful, 0 skipped, and 0 pending checks') == 'failing'
 assert c('1 cancelled, 0 failing, 1 successful, 0 skipped, and 0 pending checks') == 'failing'
 assert c('gibberish') == 'unknown'
 " >/dev/null 2>&1 && echo "PASS  ship: classify_checks" || { echo "FAIL  ship: classify_checks"; FAIL=1; }
+
+"$PY" - <<'PY' >/dev/null 2>&1
+import copy
+import ast
+import sys
+sys.path.insert(0, 'tools')
+import cos_ship
+from cos_ship import (
+    authenticated_environments,
+    jwt_claims,
+    validate_installation_scope,
+    validate_resume_pr,
+)
+
+publisher = {
+    'app_id': 4278642,
+    'installation_id': 146047322,
+    'slug': 'cm4bery-cos-executor',
+    'pr_author_login': 'app/cm4bery-cos-executor',
+    'repository': 'CM4BERY/cos',
+    'repository_selection': 'selected',
+    'permissions': {
+        'actions': 'read', 'checks': 'read', 'contents': 'write',
+        'metadata': 'read', 'pull_requests': 'write', 'statuses': 'read',
+    },
+}
+app = {'id': 4278642, 'slug': 'cm4bery-cos-executor'}
+installation = {
+    'id': 146047322, 'app_id': 4278642,
+    'app_slug': 'cm4bery-cos-executor',
+    'account': {'login': 'CM4BERY'}, 'repository_selection': 'selected',
+}
+payload = {
+    'permissions': copy.deepcopy(publisher['permissions']),
+    'repositories': [{'full_name': 'CM4BERY/cos'}],
+}
+validate_installation_scope(publisher, app, installation, payload)
+assert jwt_claims(publisher, 1_000) == {'iat': 940, 'exp': 1_540, 'iss': 4278642}
+
+for mutation in ('extra_repo', 'workflow_write', 'all_repositories', 'wrong_app'):
+    p, a, i, t = map(copy.deepcopy, (publisher, app, installation, payload))
+    if mutation == 'extra_repo':
+        t['repositories'].append({'full_name': 'CM4BERY/other'})
+    elif mutation == 'workflow_write':
+        t['permissions']['workflows'] = 'write'
+    elif mutation == 'all_repositories':
+        i['repository_selection'] = 'all'
+    else:
+        a['slug'] = 'different-app'
+    try:
+        validate_installation_scope(p, a, i, t)
+    except ValueError:
+        pass
+    else:
+        raise AssertionError(f'{mutation} should fail closed')
+
+resume_pr = {
+    'author': {'login': 'app/cm4bery-cos-executor'}, 'isDraft': True,
+    'baseRefName': 'main', 'headRefName': 'tr-0018',
+    'headRepositoryOwner': {'login': 'CM4BERY'},
+    'headRepository': {'name': 'cos'},
+}
+validate_resume_pr(resume_pr, publisher, 'tr-0018')
+for field, value in (
+    ('author', {'login': 'CMABERY'}), ('isDraft', False),
+    ('baseRefName', 'release'), ('headRefName', 'tr-9999'),
+    ('headRepositoryOwner', {'login': 'fork-owner'}),
+    ('headRepository', {'name': 'other'}),
+):
+    bad = copy.deepcopy(resume_pr)
+    bad[field] = value
+    try:
+        validate_resume_pr(bad, publisher, 'tr-0018')
+    except ValueError:
+        pass
+    else:
+        raise AssertionError(f'resume mutation {field} should fail closed')
+
+gh_env, git_env = authenticated_environments('ephemeral-test-token')
+assert gh_env['GH_TOKEN'] == 'ephemeral-test-token'
+assert git_env['GIT_TERMINAL_PROMPT'] == '0'
+assert git_env['GIT_CONFIG_VALUE_1'] == 'git@github.com:'
+assert 'ephemeral-test-token' not in git_env['GIT_CONFIG_VALUE_0']
+
+revoked = []
+original_mint = cos_ship.mint_installation_token
+original_revoke = cos_ship.revoke_installation_token
+cos_ship.mint_installation_token = lambda cfg: {
+    'token': 'ephemeral-test-token', 'publisher': {}, 'expires_at': 'test',
+}
+cos_ship.revoke_installation_token = lambda credentials: revoked.append(credentials['token'])
+try:
+    assert cos_ship.with_installation_token({}, lambda credentials: 7) == 7
+    try:
+        cos_ship.with_installation_token({}, lambda credentials: (_ for _ in ()).throw(RuntimeError('probe')))
+    except RuntimeError as exc:
+        assert str(exc) == 'probe'
+    else:
+        raise AssertionError('action exception should propagate')
+finally:
+    cos_ship.mint_installation_token = original_mint
+    cos_ship.revoke_installation_token = original_revoke
+assert revoked == ['ephemeral-test-token', 'ephemeral-test-token']
+
+# Scope failure after mint revokes before propagating the refusal.
+fake_publisher = dict(publisher, kind='github_app', bot_login='cm4bery-cos-executor[bot]',
+                      private_key_path='unused', api_version='2026-03-10')
+api_calls = []
+def fake_api(path, token, method='GET', api_version=None):
+    api_calls.append((path, method, token))
+    if path == '/app': return app
+    if path.startswith('/app/installations/') and path.endswith('/access_tokens'):
+        return {'token': 'scope-token', 'permissions': copy.deepcopy(publisher['permissions'])}
+    if path.startswith('/app/installations/'):
+        return installation
+    if path.startswith('/installation/repositories'):
+        return {'total_count': 2, 'repositories': [
+            {'full_name': 'CM4BERY/cos'}, {'full_name': 'CM4BERY/other'}]}
+    if path == '/installation/token' and method == 'DELETE': return None
+    raise AssertionError((path, method))
+original_jwt = cos_ship._app_jwt
+original_api = cos_ship._github_json
+cos_ship._app_jwt = lambda publisher: 'jwt'
+cos_ship._github_json = fake_api
+try:
+    try:
+        cos_ship.mint_installation_token({'publisher': fake_publisher})
+    except ValueError:
+        pass
+    else:
+        raise AssertionError('expanded repository scope should refuse')
+finally:
+    cos_ship._app_jwt = original_jwt
+    cos_ship._github_json = original_api
+assert ('/installation/token', 'DELETE', 'scope-token') in api_calls
+
+# Revocation failure is terminal rather than silently succeeding.
+cos_ship.mint_installation_token = lambda cfg: {
+    'token': 'ephemeral-test-token', 'publisher': {}, 'expires_at': 'test',
+}
+cos_ship.revoke_installation_token = lambda credentials: (_ for _ in ()).throw(RuntimeError('revoke'))
+try:
+    try:
+        cos_ship.with_installation_token({}, lambda credentials: 0)
+    except SystemExit as exc:
+        assert exc.code == 1
+    else:
+        raise AssertionError('revocation failure should be terminal')
+finally:
+    cos_ship.mint_installation_token = original_mint
+    cos_ship.revoke_installation_token = original_revoke
+
+# Every remote gh/Git subprocess receives an explicit App environment.
+tree = ast.parse(open('tools/cos_ship.py').read())
+for call in (n for n in ast.walk(tree) if isinstance(n, ast.Call)
+             and isinstance(n.func, ast.Name) and n.func.id == 'sh'):
+    if not call.args or not isinstance(call.args[0], ast.List):
+        continue
+    values = [e.value for e in call.args[0].elts if isinstance(e, ast.Constant)]
+    is_remote = values and (values[0] == 'gh' or
+                            (values[0] == 'git' and len(values) > 1 and
+                             values[1] in {'push', 'fetch', 'pull', 'ls-remote'}))
+    if is_remote:
+        assert any(k.arg == 'env' for k in call.keywords), values
+PY
+[ "$?" = "0" ] && echo "PASS  ship: App scope and credential isolation" \
+  || { echo "FAIL  ship: App scope and credential isolation"; FAIL=1; }
+
+"$PY" - <<'PY' >/dev/null 2>&1
+import yaml
+cfg = yaml.safe_load(open('policy/navigation.yaml'))
+assert cfg['publisher']['bot_login'] == 'cm4bery-cos-executor[bot]'
+assert cfg['publisher']['repository'] == 'CM4BERY/cos'
+assert cfg['publisher']['repository_selection'] == 'selected'
+assert cfg['allow_admin_merge'] is False
+assert cfg['draft_pull_requests'] is True
+assert set(cfg['bypass'].values()) == {'review'}
+owners = open('.github/CODEOWNERS').read()
+assert '@CMABERY' in owners and '@CM4BERY' not in owners
+PY
+[ "$?" = "0" ] && echo "PASS  ship: governed App policy and human CODEOWNER" \
+  || { echo "FAIL  ship: governed App policy and human CODEOWNER"; FAIL=1; }
 
 # --- governance debt tool: seeded breach detected FIRST (failing-first),
 #     then the healthy repo, then byte-determinism (story-001 acceptance).

@@ -1,17 +1,34 @@
 # Navigation policy for tools/cos_ship.py. Elevated scope (policy/**).
-# Owner-resolved decisions recorded in docs/navigation-layer.md section 7.
-version: "0.1.0"
-expected_account: CMABERY
+# Owner-resolved decisions recorded in docs/navigation-layer.md sections 7-8.
+version: "0.2.0"
+publisher:
+  kind: github_app
+  app_id: 4278642
+  installation_id: 146047322
+  slug: cm4bery-cos-executor
+  bot_login: "cm4bery-cos-executor[bot]"
+  pr_author_login: app/cm4bery-cos-executor
+  repository: CM4BERY/cos
+  private_key_path: ~/.config/cos/cos-executor.pem
+  api_version: "2026-03-10"
+  repository_selection: selected
+  permissions:
+    actions: read
+    checks: read
+    contents: write
+    metadata: read
+    pull_requests: write
+    statuses: read
 merge_method: squash
 delete_branch_after_merge: true
-# Bypass evidence lives where the bypass happens: GitHub's PR timeline.
-# review lanes: cos_ship opens the PR, watches checks, and stops before
-# merging; a human completes the merge and records the one-line reason as
-# their PR review/merge comment (the typed-comment code path in cos_ship is
-# flag-mode only). governance_debt.py (Stage 3) counts bypass-merged PRs by
-# lane. Decision of record: docs/navigation-layer.md section 7, item 4.
+draft_pull_requests: true
+allow_admin_merge: false
+# Initial App posture: every lane is review-mode. cos_ship opens a draft PR,
+# watches checks, and stops before merging; CMABERY reviews and completes the
+# merge without granting the App ruleset bypass. Decision of record:
+# docs/navigation-layer.md section 8 and amendment A-0002.
 bypass:
-  low: auto        # merge with --admin, no ceremony
-  medium: auto
-  high: review     # ship stops before merge; a human reviews and completes it
+  low: review
+  medium: review
+  high: review
   critical: review

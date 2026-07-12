@@ -1,0 +1,24 @@
+tr-0018 full COS validation
+Date: 2026-07-12
+Command: bash tools/cos_validate.sh
+
+cos-validate: base=origin/main head=WORKTREE
+[PASS] validate_ledger
+[PASS] validate_schemas
+[PASS] validate_capability_scope
+[PASS] validate_enforcement_claims
+       warn: .claude/skills/cos-amendment/SKILL.md: locus-exempt file (non-normative by declaration)
+       warn: .claude/skills/cos-transition/SKILL.md: locus-exempt file (non-normative by declaration)
+       warn: docs/automation-layer.md: locus-exempt file (non-normative by declaration)
+       warn: docs/navigation-layer.md: locus-exempt file (non-normative by declaration)
+       warn: docs/target-architecture.md: locus-exempt file (non-normative by declaration)
+[PASS] validate_no_self_approval
+RESULT: ALL PASS -- transition may commit
+
+Companion checks in this transition:
+- `bash tools/test_hooks.sh`: HARNESS: ALL PASS (40 assertions)
+- `python3 tools/cos_ship.py --auth-smoke`: App/install/repository/permission,
+  gh, and HTTPS Git probes pass; installation token revoked
+- GitHub ruleset API audit: one approval and CODEOWNER review on default
+  branch; no App/Integration bypass actor
+- Independent transition audit: READY, no remaining high or medium findings

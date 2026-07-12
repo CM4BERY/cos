@@ -32,3 +32,18 @@ forbidden:
     - branch-protection
   risk_class_self_declaration_override:
     - validators/validate_capability_scope.py
+
+# Navigation amendment A-0002. These rules are not new risk classes; they
+# bind the publisher configuration to deterministic local and platform gates.
+navigation:
+  publisher_identity_separation:
+    - tools/cos_ship.py
+    - codeowners
+  installation_scope_and_permissions:
+    - tools/cos_ship.py
+  human_review_for_every_lane:
+    - tools/cos_ship.py
+    - branch-protection
+  no_publisher_ruleset_bypass:
+    - tools/cos_ship.py
+    - branch-protection

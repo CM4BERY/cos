@@ -1,0 +1,29 @@
+tr-0018 ruleset and review audit
+Date: 2026-07-12
+Commands:
+  gh api /repos/CM4BERY/cos/rulesets
+  gh api /repos/CM4BERY/cos/rulesets/18642527
+
+Observed active default-branch ruleset:
+- id: 18642527
+- name: 123
+- enforcement: active
+- target: branch
+- include: ~DEFAULT_BRANCH
+- required status check: validate
+- pull request required: true
+- required approving review count: 1
+- require code owner review: true
+- non-fast-forward and deletion protections: present
+- bypass actors: one RepositoryRole actor (id 5, always)
+- Integration or GitHub App bypass actors: none
+- cm4bery-cos-executor App id 4278642 in bypass actors: no
+
+Result: PASS for the tr-0018 boundary. The platform requires one approval on
+default-branch PRs and CODEOWNER review where CODEOWNERS applies. The App is
+not a bypass actor. The existing RepositoryRole bypass belongs to platform
+administration outside the App and outside this transition; cos_ship also
+sets allow_admin_merge=false and maps every lane to review.
+
+This was a read-only GitHub API inspection. No ruleset or repository setting
+was changed.
