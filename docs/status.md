@@ -1,4 +1,4 @@
-# System status — 2026-07-09, close of the Ralph pilot session (tr-0013)
+# System status — 2026-07-12, GitHub App publisher transition (tr-0018)
 
 Durable context-recovery point. The repo is the state; this file is the map.
 A fresh session (human, Cowork, or Claude Code) reads this, CLAUDE.md, and
@@ -27,6 +27,14 @@ shipped as three governed transitions and one live story:
   debt report with hard thresholds (exit 1 on merges without ledger linkage,
   review-mode merges lacking a recorded reason, expired-capability events);
   six failing-first harness fixtures. First live Ralph iteration, end to end.
+- tr-0017 (high, App-authored and human-approved): owner-ratified
+  `cap-0002-publisher-transition`, bound to tr-0018 and narrow publisher,
+  governance, documentation, record, and evidence targets.
+- tr-0018 (high, this transition): `cos_ship` mints short-lived GitHub App
+  installation tokens and revokes them after each run, verifies repository and
+  permission scope, publishes draft PRs as
+  `cm4bery-cos-executor[bot]`, and stops every lane for human review. A-0002
+  records the rule change and replay.
 
 Pilot findings of record: a concurrent second runner invocation raced the
 first over the tr-0012 scaffold; the losing iteration detected it, unwound to
@@ -37,11 +45,13 @@ gitignored local settings.
 
 ## Identities and authority
 
-Unchanged from tr-0008: `CMABERY` is the sole human owner and gh-pinned
-account; the agent (`agent:claude-fable-5`) acts under
-`cap-0001-agent-standing` (expires 2026-08-07T05:00Z) covering tools/**,
-docs/**, README.md, policy/navigation.yaml, .claude/**, and record paths;
-constitution/ and secrets/** denied.
+`CM4BERY` is the organization/repository owner; `CMABERY` is the human root
+authority and CODEOWNER; `cm4bery-cos-executor[bot]` is the publisher and PR
+author. The agent (`agent:claude-fable-5`) executes tr-0018 under the
+human-issued `cap-0002-publisher-transition`, expiring
+2026-07-19T10:42:53Z. Constitution and secrets remain denied. The App has no
+ruleset bypass, workflow, administration, issues, secrets, or organization
+permission.
 
 ## The operating loop
 
@@ -49,17 +59,18 @@ constitution/ and secrets/** denied.
 2. Work within declared targets (hooks watch); update the record if scope grows.
 3. Record: `python3 tools/cos_append_event.py --transition tr-NNNN`, then
    `bash tools/cos_validate.sh`, then commit as the agent.
-4. Ship: `python3 tools/cos_ship.py` — low/medium auto-merge; high/critical
-   stop before merge for a human reviewer.
+4. Ship: `python3 tools/cos_ship.py` — mint a scoped App token, push and open
+   a draft PR, watch checks, revoke the token, and stop before merge for
+   `CMABERY` on every lane.
 Ralph iterations: `bash tools/ralph_loop.sh` in the pilot clone, one story per
 invocation, a human watching; the backlog is the queue.
 
 ## Machine notes
 
-- Pilot clone: `~/cos-pilot` on Ubuntu (WSL), bash in Windows Terminal —
-  claude CLI, gh authenticated as CMABERY, python-is-python3 so the `python`
-  hook launcher resolves, and `.claude/settings.local.json` (gitignored)
-  allowlisting the deterministic COS tools. All Ralph runs happen here.
+- Active governance clone: `~/projects/cos` on Ubuntu 24.04 (WSL). The App
+  PEM is owner-only at `~/.config/cos/cos-executor.pem`; `cos_ship` does not
+  use or alter the human's stored `gh` credential. The unrelated
+  `origin/tr-0016` runner-lock WIP remains unchanged.
 - Governance clone: `C:\cos-clean` on Windows — Cowork agent sessions mount
   it through a sync layer that twice corrupted git metadata during the pilot
   session (.git/index zero-filled, ORIG_HEAD broken; repaired by deleting the
@@ -87,6 +98,5 @@ invocation, a human watching; the backlog is the queue.
 
 ## Ledger at close
 
-Fourteen events, evt-0001 (genesis) through evt-0014 (this transition).
-Every commit on main replays clean through `validators/run_all.py`. The
-ledger is the truth; this file is only the tour.
+Eighteen events, evt-0001 (genesis) through evt-0018 (this transition).
+The ledger is the truth; this file is only the tour.

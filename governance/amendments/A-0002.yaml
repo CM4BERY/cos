@@ -1,0 +1,76 @@
+id: A-0002
+title: "Separate the GitHub App publisher from the human reviewer"
+proposed_by:
+  actor: "agent:claude-fable-5"
+  office: executor
+target:
+  file: policy/navigation.yaml
+  section: "publisher identity and merge modes"
+reason:
+  - >-
+    evt-0003 bound protected scopes to @CM4BERY, the organization owner
+    handle, rather than @CMABERY, the human reviewer account.
+  - >-
+    evt-0008 pinned cos_ship to the CMABERY human credential, so the same
+    identity authored and was expected to govern its pull requests.
+  - >-
+    evt-0010 introduced human review only for high and critical lanes; later
+    low and medium events still used autonomous admin merge paths.
+  - >-
+    evt-0017 records the owner-ratified capability for tr-0018 after an
+    App-authored, human-approved PR demonstrated the separated identities.
+  - >-
+    Expected effect: cm4bery-cos-executor[bot] publishes draft PRs with
+    exact installation scope, CMABERY remains review authority, and every
+    lane stops for human review without App ruleset bypass.
+evidence:
+  - evidence/simulations/tr-0018-publisher-identity.md
+  - evidence/test_runs/tr-0018-app-auth-smoke.txt
+  - evidence/test_runs/tr-0018-hook-harness.txt
+  - evidence/test_runs/tr-0018-ruleset-audit.txt
+  - evidence/reviews/tr-0018-publisher-transition-review.md
+proposed_change:
+  from: |-
+    version: "0.1.0"
+    expected_account: CMABERY
+    merge_method: squash
+    delete_branch_after_merge: true
+    bypass:
+      low: auto
+      medium: auto
+      high: review
+      critical: review
+  to: |-
+    version: "0.2.0"
+    publisher:
+      kind: github_app
+      app_id: 4278642
+      installation_id: 146047322
+      slug: cm4bery-cos-executor
+      bot_login: "cm4bery-cos-executor[bot]"
+      pr_author_login: app/cm4bery-cos-executor
+      repository: CM4BERY/cos
+      private_key_path: ~/.config/cos/cos-executor.pem
+      api_version: "2026-03-10"
+      repository_selection: selected
+      permissions:
+        actions: read
+        checks: read
+        contents: write
+        metadata: read
+        pull_requests: write
+        statuses: read
+    merge_method: squash
+    delete_branch_after_merge: true
+    draft_pull_requests: true
+    allow_admin_merge: false
+    bypass:
+      low: review
+      medium: review
+      high: review
+      critical: review
+rollback: >-
+  Revert the tr-0018 commit. The GitHub App remains installed but unused;
+  cos_ship returns to the prior human credential and lane mapping. Revoke
+  any in-flight installation token; no ruleset or workflow setting needs
+  rollback because tr-0018 changes neither.

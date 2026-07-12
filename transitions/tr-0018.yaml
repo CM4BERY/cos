@@ -1,0 +1,47 @@
+id: tr-0018
+intent: Separate the COS publisher from the human reviewer by authenticating cos_ship
+  as cm4bery-cos-executor[bot], requiring human review for every lane, and binding
+  protected scopes to @CMABERY
+requested_by:
+  actor: agent:claude-fable-5
+  office: executor
+capability_id: cap-0002-publisher-transition
+targets:
+- tools/cos_ship.py
+- tools/test_hooks.sh
+- policy/navigation.yaml
+- policy/enforcement_loci.yaml
+- .github/CODEOWNERS
+- governance/amendments/A-0002.yaml
+- docs/navigation-layer.md
+- docs/status.md
+- evidence/simulations/tr-0018-publisher-identity.md
+- evidence/reviews/tr-0018-publisher-transition-review.md
+- evidence/test_runs/tr-0018-app-auth-smoke.txt
+- evidence/test_runs/tr-0018-hook-harness.txt
+- evidence/test_runs/tr-0018-ruleset-audit.txt
+- evidence/test_runs/tr-0018-validation.txt
+advisory_risk_class: high
+rollback_plan: >-
+  Revert the tr-0018 commit to restore the human-token publisher and prior
+  lane map. The external GitHub App installation remains present but unused;
+  suspend or uninstall it separately only if the human owner chooses. The
+  transition changes no workflow, ruleset, bypass actor, secret, or
+  organization setting, and all smoke-test installation tokens are revoked.
+verification_note: >-
+  Failing-first App scope verification rejected an optional empty token
+  repository list; the implementation now queries the authenticated
+  installation repository endpoint and requires exactly CM4BERY/cos. The
+  offline hook/publisher harness ends HARNESS: ALL PASS (40 assertions). A
+  live read-only --auth-smoke verifies the App, selected repository, exact
+  permissions, gh child process, HTTPS Git child process, and immediate token
+  revocation. Full COS validation and the independent transition audit are
+  recorded in the evidence paths below.
+evidence:
+  reviews:
+  - evidence/reviews/tr-0018-publisher-transition-review.md
+  test_runs:
+  - evidence/test_runs/tr-0018-app-auth-smoke.txt
+  - evidence/test_runs/tr-0018-hook-harness.txt
+  - evidence/test_runs/tr-0018-ruleset-audit.txt
+  - evidence/test_runs/tr-0018-validation.txt
