@@ -1,0 +1,62 @@
+# Owner-ratified, 72-hour authority for the review-integrity amendment.
+# Publication and ruleset mutation remain owner-controlled external actions.
+id: cap-0003-review-integrity-amendment
+issued_by: "human:boss <coltonmabery@gmail.com>"
+issued_to_actor: "agent:codex"
+issued_for_office: executor
+task_id: tr-0021
+allowed_actions:
+  - create_branch
+  - create_file
+  - edit_file
+  - run_validators
+  - run_test_harness
+  - run_historical_replay
+  - run_governance_debt
+  - read_repository_ruleset
+  - commit
+  - authenticate_app_for_tr-0020
+  - publish_tr-0020
+allowed_targets:
+  - capabilities/cap-0003-review-integrity-amendment.yaml
+  - governance/amendments/A-0003.yaml
+  - policy/risk_model.yaml
+  - policy/enforcement_loci.yaml
+  - validators/validate_capability_scope.py
+  - tools/governance_debt.py
+  - tools/test_hooks.sh
+  - docs/navigation-layer.md
+  - docs/ralph-backlog.yaml
+  - transitions/tr-0020.yaml
+  - transitions/tr-0021.yaml
+  - ledger/events.ndjson
+  - evidence/approvals/cap-0003-review-integrity-ratification.md
+  - evidence/approvals/cap-0003-owner-publication-authorization.md
+  - evidence/approvals/tr-0021-ruleset-mutation-authorization.md
+  - evidence/reviews/tr-0020-capability-scope-review.md
+  - evidence/reviews/tr-0021-review-integrity-review.md
+  - evidence/simulations/tr-0021-review-integrity.md
+  - evidence/test_runs/tr-0020-validation.txt
+  - evidence/test_runs/tr-0021-ruleset-before-after.txt
+  - evidence/test_runs/tr-0021-hook-harness.txt
+  - evidence/test_runs/tr-0021-historical-replay.txt
+  - evidence/test_runs/tr-0021-governance-debt.txt
+  - evidence/test_runs/tr-0021-validation.txt
+denied_targets:
+  - secrets/**
+  - constitution/**
+issued_at: "2026-07-12T14:20:47Z"
+expires_at: "2026-07-15T14:20:47Z"
+revocable: true
+notes: >-
+  Owner-ratified authority for tr-0020 issuance and the single A-0003
+  review-integrity amendment in tr-0021. The actor is agent:codex and the
+  authorized Git author is codex (agent) <agent@cos.local>. This capability
+  grants no merge, ruleset-update, or tr-0021 publication action. By direct
+  in-session authorization from human:boss, agent:codex may authenticate the
+  configured GitHub App and invoke cos_ship only to push tr-0020, create or
+  resume its draft pull request, and observe checks; the App must stop before
+  merge. human:boss alone may invoke the App for tr-0021 and mutate ruleset
+  18642527 under the separate approval artifacts carried by tr-0020.
+  Bound-review enforcement activates only when A-0003 exists in the validated
+  head; tr-0020 and historical heads retain legacy review semantics.
