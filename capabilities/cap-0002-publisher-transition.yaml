@@ -31,11 +31,12 @@ denied_targets:
   - "secrets/**"
   - "constitution/**"
 issued_at: "2026-07-12T10:42:53Z"
-expires_at: "2026-07-19T10:42:53Z"
+expires_at: "2026-07-12T12:38:08Z"
 revocable: true
 notes: >-
   Seven-day authority declared for tr-0018: transition the COS publisher to
   the cm4bery-cos-executor GitHub App while preserving human review and
   keeping constitution, secrets, and every other capability file out of
   scope. COS v0 technically enforces actor, time, and targets; task_id,
-  office, and allowed_actions are documentary.
+  office, and allowed_actions are documentary. Revocation after successful
+  task completion is carried by tr-0019 and evt-0019.
