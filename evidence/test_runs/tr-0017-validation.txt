@@ -1,0 +1,35 @@
+tr-0017 capability issuance validation
+date_utc: 2026-07-12
+base: origin/main (075020978d1b5c6577e277474cc876af68e9e8ef)
+
+STATIC SCOPE ASSERTIONS
+CAPABILITY_ASSERTIONS=PASS
+VALIDITY_SECONDS=604800
+allowed_actions: exact owner-approved set
+allowed_targets: exact owner-approved set plus own exact capability file
+denied_targets: secrets/** and constitution/** only
+sibling capability path: not allowed
+
+HOOK HARNESS
+context: clean main worktree exactly at origin/main (075020978d1b5c6577e277474cc876af68e9e8ef)
+command: git switch main && bash tools/test_hooks.sh
+result: HARNESS: ALL PASS (38 PASS assertions)
+note: the harness's ship fixture intentionally asserts that cos_ship refuses
+      on main; therefore its supported execution context is main, while the
+      five-validator suite below evaluates the tr-0017 transition bytes.
+
+FIVE-VALIDATOR COS SUITE
+command: BASE=origin/main bash tools/cos_validate.sh
+output:
+cos-validate: base=origin/main head=WORKTREE
+[PASS] validate_ledger
+[PASS] validate_schemas
+[PASS] validate_capability_scope
+[PASS] validate_enforcement_claims
+       warn: .claude/skills/cos-amendment/SKILL.md: locus-exempt file (non-normative by declaration)
+       warn: .claude/skills/cos-transition/SKILL.md: locus-exempt file (non-normative by declaration)
+       warn: docs/automation-layer.md: locus-exempt file (non-normative by declaration)
+       warn: docs/navigation-layer.md: locus-exempt file (non-normative by declaration)
+       warn: docs/target-architecture.md: locus-exempt file (non-normative by declaration)
+[PASS] validate_no_self_approval
+RESULT: ALL PASS -- transition may commit

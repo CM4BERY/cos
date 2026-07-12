@@ -1,0 +1,37 @@
+id: tr-0017
+intent: >-
+  Human-owner issuance of cap-0002-publisher-transition: seven-day,
+  purpose-declared authority for agent:claude-fable-5 to execute the GitHub
+  App publisher transition as tr-0018, with only the approved publisher,
+  governance, documentation, and record surfaces in the enforced target
+  allowlist
+requested_by:
+  actor: agent:claude-fable-5
+  office: executor
+capability_id: cap-0002-publisher-transition
+targets:
+  - capabilities/cap-0002-publisher-transition.yaml
+  - evidence/approvals/cap-0002-publisher-transition-ratification.md
+  - evidence/reviews/tr-0017-capability-scope-review.md
+  - evidence/test_runs/tr-0017-validation.txt
+advisory_risk_class: high
+rollback_plan: >-
+  Revert the tr-0017 squash commit to remove cap-0002 from main. This
+  transition mints no installation token and changes no GitHub App or
+  ruleset setting, so no external rollback is required.
+verification_note: >-
+  Executed in this transition: exact-set and seven-day scope assertions PASS;
+  independent authority review READY; bash tools/test_hooks.sh on its intended
+  clean origin/main fixture context ends HARNESS: ALL PASS (38 assertions);
+  BASE=origin/main bash tools/cos_validate.sh ends RESULT: ALL PASS --
+  transition may commit (all five validators). The review also records that
+  task_id, office, and allowed_actions are documentary under COS v0 while
+  actor, time, and targets are enforced. Exact results are in
+  evidence/test_runs/tr-0017-validation.txt.
+evidence:
+  approvals:
+    - evidence/approvals/cap-0002-publisher-transition-ratification.md
+  reviews:
+    - evidence/reviews/tr-0017-capability-scope-review.md
+  test_runs:
+    - evidence/test_runs/tr-0017-validation.txt
